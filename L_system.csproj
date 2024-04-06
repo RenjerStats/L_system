@@ -8,4 +8,14 @@
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
+  <ProjectExtensions><VisualStudio><UserProperties save_4saves_1json__JsonSchema="https://cdn.jsdelivr.net/npm/tsup/schema.json" /></VisualStudio></ProjectExtensions>
+  <ItemGroup>
+    <Page Include="App.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="canvases\" />
+    <Folder Include="funcForL_system\" />
+  </ItemGroup>
+
 </Project>
