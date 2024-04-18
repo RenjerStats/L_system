@@ -24,5 +24,26 @@ namespace L_system.view
         {
             InitializeComponent();
         }
+
+        private void MainGrid_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (Mouse.LeftButton == MouseButtonState.Pressed)
+            {
+                Application.Current.MainWindow.DragMove();
+            }
+            if (e.ClickCount == 2)
+            {
+                var curState = Application.Current.MainWindow.WindowState;
+                if (curState == WindowState.Maximized)
+                    Application.Current.MainWindow.WindowState = WindowState.Normal;
+                else if (curState == WindowState.Normal)
+                    Application.Current.MainWindow.WindowState = WindowState.Maximized;
+            }
+        }
+
+        private void CloseButton_Click(object sender, RoutedEventArgs e)
+        {
+            Application.Current.MainWindow.Close();
+        }
     }
 }
