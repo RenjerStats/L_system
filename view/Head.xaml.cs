@@ -24,5 +24,18 @@ namespace L_system.view
         {
             InitializeComponent();
         }
+
+        private void MainGrid_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (MouseButtonState.Pressed == Mouse.LeftButton)
+            {
+                Application.Current.MainWindow.DragMove();
+            }
+        }
+
+        private void CloseButton_Click(object sender, RoutedEventArgs e)
+        {
+            Application.Current.MainWindow.Close();
+        }
     }
 }
