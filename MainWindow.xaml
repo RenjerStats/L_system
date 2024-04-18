@@ -4,9 +4,28 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:L_system"
+        xmlns:userCOntrols="clr-namespace:L_system.view"
+        x:Name="L_system"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
-        
-    </Grid>
+        Title="MainWindow"
+        Height="450" Width="800"
+        MinHeight="500" MinWidth="700"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        ResizeMode="CanResizeWithGrip"
+        WindowStartupLocation="CenterScreen"
+        Background="Transparent"
+        >
+
+
+    <Border BorderBrush="Black" BorderThickness="5" CornerRadius="5,5,0,5">
+        <DockPanel x:Name="mainGrid" Background="#FF202130" LastChildFill="True">
+            <userCOntrols:Head DockPanel.Dock="Top" Height="100"/>
+            <ListView DockPanel.Dock="Left">
+
+            </ListView>
+            <Canvas/>
+        </DockPanel>
+    </Border>
+
 </Window>

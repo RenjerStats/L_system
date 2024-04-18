@@ -1,0 +1,45 @@
+﻿<UserControl x:Class="L_system.view.Head"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:L_system.view"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+
+<Grid Background="#FF005E50">
+    <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="50"/>
+        <ColumnDefinition/>
+        <ColumnDefinition/>
+        <ColumnDefinition Width="50"/>
+        </Grid.ColumnDefinitions>
+    <Grid.RowDefinitions>
+        <RowDefinition/>
+        <RowDefinition/>
+    </Grid.RowDefinitions>
+
+    <Image/>
+    <Menu Grid.Column="1">
+        <MenuItem Header="Файл">
+            <MenuItem Header="Создать"/>
+            <MenuItem Header="Открыть"/>
+            <MenuItem Header="Сохранить"/>
+        </MenuItem>
+        <MenuItem Header="Информация">
+
+        </MenuItem>
+    </Menu>
+    <StackPanel Grid.Column="2" Orientation="Horizontal">
+            <Button/>
+    </StackPanel>
+    <Button x:Name="ButtonExit" Grid.Column="3">
+        <Image/>
+    </Button>
+
+    <StackPanel Grid.Row="1" Grid.ColumnSpan="4" Orientation="Horizontal">
+        
+    </StackPanel>
+
+</Grid>
+</UserControl>

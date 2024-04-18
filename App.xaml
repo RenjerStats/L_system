@@ -1,9 +1,10 @@
-﻿<Application x:Class="L_system.App"
+﻿    <Application x:Class="L_system.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:L_system"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
          
+        <SolidColorBrush x:Key="MainGreen" Color="#FF28A427"/>
     </Application.Resources>
 </Application>
