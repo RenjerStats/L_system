@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace L_system.view
+namespace L_system.View.Elements
 {
     /// <summary>
     /// Логика взаимодействия для Head.xaml

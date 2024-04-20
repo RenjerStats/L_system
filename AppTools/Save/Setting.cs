@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace L_system.IO
+namespace L_system.AppTools.Save
 {
-    internal class JsonFiler
+    class Setting
     {
     }
 }
