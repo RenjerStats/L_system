@@ -7,12 +7,12 @@ using System.Windows.Documents;
 
 namespace L_system.Model.core
 {
-    public class L_system_engine(Command[] axiom, Dictionary<Command, Command[]> changeTo)
+    public class L_system_engine(Instruction[] axiom, Dictionary<Instruction, Instruction[]> changeTo)
     {
-        private List<Command> axiom = new(axiom);
-        private readonly Dictionary<Command, Command[]> changeTo = changeTo;
+        private List<Instruction> axiom = new(axiom);
+        private readonly Dictionary<Instruction, Instruction[]> changeTo = changeTo;
 
-        public Command[] GetInstructions() => axiom.ToArray();
+        public Instruction[] GetInstructions() => axiom.ToArray();
 
         public void Iterate()
         {
@@ -33,13 +33,13 @@ namespace L_system.Model.core
             }
         }
 
-        private void InsertingListWithReplacement(int index, Command[] to)
+        private void InsertingListWithReplacement(int index, Instruction[] to)
         {
             if (axiom.Count == 1)
-                axiom = new List<Command>(to);
+                axiom = new List<Instruction>(to);
             else
             {
-                List<Command> right = axiom[(index + 1)..^0];
+                List<Instruction> right = axiom[(index + 1)..^0];
                 axiom = axiom[0..index];
 
                 axiom.AddRange(to);

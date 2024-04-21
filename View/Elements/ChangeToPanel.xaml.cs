@@ -1,4 +1,5 @@
-﻿using System;
+﻿using L_system.ViewModel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,6 +24,7 @@ namespace L_system.View.Elements
         public ChangeToPanel()
         {
             InitializeComponent();
+            this.Content = new InstructionsListViewModel();
         }
     }
 }

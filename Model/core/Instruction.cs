@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace L_system.Model.core
+namespace L_system.Model
 {
-    public enum CommandType
+    public enum InstructionType
     {
         rotate = 'r',
         move = 'm',
@@ -17,17 +17,17 @@ namespace L_system.Model.core
         nothingDoing2 = '2',
         nothingDoing3 = '3'
     }
-    public readonly struct Command(CommandType type, float val = 0)
+    public readonly struct Instruction(InstructionType type, float val = 0)
     {
         public readonly float val = val;
-        public readonly CommandType type = type;
+        public readonly InstructionType type = type;
 
         public override readonly bool Equals(object? obj)
         {
-            if (obj is not Command)
+            if (obj is not Instruction)
                 return false;
             else
-                return val == ((Command)obj).val && type == ((Command)obj).type;
+                return val == ((Instruction)obj).val && type == ((Instruction)obj).type;
         }
 
         public override readonly int GetHashCode()
@@ -40,12 +40,12 @@ namespace L_system.Model.core
             return $"{type}: {val}";
         }
 
-        public static bool operator ==(Command left, Command right)
+        public static bool operator ==(Instruction left, Instruction right)
         {
             return left.Equals(right);
         }
 
-        public static bool operator !=(Command left, Command right)
+        public static bool operator !=(Instruction left, Instruction right)
         {
             return !(left == right);
         }

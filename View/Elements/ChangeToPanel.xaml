@@ -6,7 +6,13 @@
              xmlns:local="clr-namespace:L_system.View.Elements"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <ListView ScrollViewer.HorizontalScrollBarVisibility="Disabled" HorizontalContentAlignment="Stretch" SelectionMode="Single" Name="TileList" ScrollViewer.VerticalScrollBarVisibility="Auto" >
+    <ListView ItemsSource="{Binding Instructions}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" HorizontalContentAlignment="Stretch" SelectionMode="Single" Name="TileList" ScrollViewer.VerticalScrollBarVisibility="Auto">
+        <ListView.ContextMenu>
+            <ContextMenu>
+                <MenuItem Header="Создать" Command="{Binding AddInstruction}"/>
+                <MenuItem Header="Очистить"/>
+            </ContextMenu>
+        </ListView.ContextMenu>
         <ListView.ItemsPanel>
             <ItemsPanelTemplate>
                 <WrapPanel IsItemsHost="True"/>
@@ -15,13 +21,13 @@
         <ListView.ItemTemplate>
             <DataTemplate>
                 <Border Width="auto" MinWidth="100" MaxWidth="150" BorderBrush="Bisque"  BorderThickness="5" Margin="10" CornerRadius="5">
-                    <Grid x:Name="dropPanel">
+                    <Grid x:Name="ItemGrid">
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="0.9*"/>
-                            <RowDefinition Height="0.1*"/>
+                            <RowDefinition Height="0.2*"/>
+                            <RowDefinition Height="0.3*"/>
+                            <RowDefinition Height="0.2*"/>
+                            <RowDefinition Height="0.3*"/>
                         </Grid.RowDefinitions>
-                        <Image Margin="5" Height="100" Width="100" Source="{Binding Path=imagePath}">
-                        </Image>
                         <TextBlock Margin="0, 1, 0, 0" Grid.Row="1" Text="{Binding Path=name}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                     </Grid>
                 </Border>
