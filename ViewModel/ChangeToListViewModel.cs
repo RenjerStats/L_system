@@ -4,30 +4,44 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using InstructionManager = L_system.Model.InstructionManager;
 
 namespace L_system.ViewModel
 {
-    public class ChangeToListViewModel
+    public class InstructionsListViewModel
     {
-        public ObservableCollection<Instruction> Change { get; set; }
-        public ObservableCollection<Instruction> To { get; set; }
-        public ICommand AddChangeCommand { get; set; }
-        public ICommand DeleteChangeCommand { get; set; }
-        public ICommand AddToCommand { get; set; }
-        public ICommand DeleteToCommand { get; set; }
+        public ObservableCollection<Instruction> Instructions { get; set; }
+        public ICommand AddInstructionCommand { get; set; }
+        public ICommand DeleteInstructionCommand { get; set; }
 
-        public ChangeToListViewModel()
+        public InstructionsListViewModel()
         {
-            Change = new();
-            To = new();
-            AddChangeCommand = new RelayCommand((object parameter) => Change.Add(new Instruction()), (object parameter) => Change.Count <= 5);
-            DeleteChangeCommand = new RelayCommand((object parameter) => Change.Remove((Instruction)parameter), (object parameter) => true);
-            AddToCommand = new RelayCommand((object parameter) => To.Add(new Instruction()), (object parameter) => To.Count <= 5);
-            DeleteToCommand = new RelayCommand((object parameter) => To.Remove((Instruction)parameter), (object parameter) => true);
+            Instructions = InstructionManager.GetInstructions();
+            AddInstructionCommand = new RelayCommand(AddBlock, CanAddBlock);
+            DeleteInstructionCommand = new RelayCommand(DeleteBlock, CanDeleteBlock);
+        }
+
+        private bool CanDeleteBlock(object obj)
+        {
+            return Instructions.Count != 0;
+        }
+
+        private void DeleteBlock(object obj)
+        {
+            Instructions.Remove((Instruction)obj);
+        }
+
+        private bool CanAddBlock(object obj)
+        {
+            return Instructions.Count < 10;
+        }
+
+        private void AddBlock(object obj)
+        {
+            Instructions.Add(new Instruction());
         }
     }
 }

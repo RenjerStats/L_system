@@ -4,7 +4,11 @@
              xmlns:local="clr-namespace:L_system"
              StartupUri="View/MainWindow.xaml">
     <Application.Resources>
-         
-        <SolidColorBrush x:Key="MainGreen" Color="#FF28A427"/>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary 
+                Source="/View/Styles/TextSlyle.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </Application.Resources>
 </Application>

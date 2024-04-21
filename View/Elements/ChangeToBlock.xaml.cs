@@ -1,5 +1,4 @@
-﻿using L_system.ViewModel;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,14 +16,13 @@ using System.Windows.Shapes;
 namespace L_system.View.Elements
 {
     /// <summary>
-    /// Логика взаимодействия для ChangeToPanel.xaml
+    /// Логика взаимодействия для ChangeToBlock.xaml
     /// </summary>
-    public partial class ChangeToPanel : UserControl
+    public partial class ChangeToBlock : UserControl
     {
-        public ChangeToPanel()
+        public ChangeToBlock()
         {
             InitializeComponent();
-            Content = new ChangeToViewModel();
         }
     }
 }

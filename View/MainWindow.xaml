@@ -29,7 +29,6 @@
                 <RowDefinition Height="auto"/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
-            
             <userControls:Head Grid.ColumnSpan="3" Height="100"/>
             <userControls:ChangeToPanel Grid.Row="1"/>
             <GridSplitter Grid.Row="1" Grid.Column="1" Width="10" HorizontalAlignment="Stretch"/>

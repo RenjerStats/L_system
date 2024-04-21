@@ -10,7 +10,10 @@ namespace L_system.Model
     public class InstructionManager
     {
         public static ObservableCollection<Instruction> instructions = new ObservableCollection<Instruction>();
-
+        Dictionary<Instruction, Instruction[]> changeTo = new()
+            {
+                { new(InstructionType.move), [new(InstructionType.rotate, 90)]}
+            };
         public static ObservableCollection<Instruction> GetInstructions()
         {
             return instructions;
