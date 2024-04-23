@@ -7,23 +7,25 @@ using System.Windows.Documents;
 
 namespace L_system.Model.core
 {
-    public class L_system_engine(Instruction[] axiom, Dictionary<Instruction, Instruction[]> changeTo)
+    public class L_system_engine(Instruction[] axiom, List<List<Instruction[]>> changeTo)
     {
-        private List<Instruction> axiom = new(axiom);
-        private readonly Dictionary<Instruction, Instruction[]> changeTo = changeTo;
+        private readonly Instruction[] axiom = axiom;
+        private readonly List<List<Instruction[]>> changeTo = changeTo;
+        private List<Instruction> currentOperations = new(axiom);
 
-        public Instruction[] GetInstructions() => axiom.ToArray();
+        public Instruction[] GetInstructions() => currentOperations.ToArray();
 
         public void Iterate()
         {
             List<int> indexWhatAlreadyBeenUsed = [];
 
-            foreach (var change in changeTo.Keys)
+            foreach (var row in changeTo)
             {
-                var to = changeTo[change];
-                for (int i = 0; i < axiom.Count; i++)
+                var change = row[0][0];
+                var to = row[1];
+                for (int i = 0; i < currentOperations.Count; i++)
                 {
-                    if (!indexWhatAlreadyBeenUsed.Contains(i) && change == axiom[i])
+                    if (!indexWhatAlreadyBeenUsed.Contains(i) && change == currentOperations[i])
                     {
                         InsertingListWithReplacement(i, to);
                         for (int q = 0; q < to.Length; q++)
@@ -35,15 +37,15 @@ namespace L_system.Model.core
 
         private void InsertingListWithReplacement(int index, Instruction[] to)
         {
-            if (axiom.Count == 1)
-                axiom = new List<Instruction>(to);
+            if (currentOperations.Count == 1)
+                currentOperations = new List<Instruction>(to);
             else
             {
-                List<Instruction> right = axiom[(index + 1)..^0];
-                axiom = axiom[0..index];
+                List<Instruction> right = currentOperations[(index + 1)..^0];
+                currentOperations = currentOperations[0..index];
 
-                axiom.AddRange(to);
-                axiom.AddRange(right);
+                currentOperations.AddRange(to);
+                currentOperations.AddRange(right);
             }
         }
     }

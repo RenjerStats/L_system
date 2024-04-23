@@ -17,10 +17,21 @@ namespace L_system.Model
         nothingDoing2 = '2',
         nothingDoing3 = '3'
     }
-    public readonly struct Instruction(InstructionType type, float val = 0)
+    public readonly struct Instruction
     {
-        public readonly float val = val;
-        public readonly InstructionType type = type;
+        public readonly float val;
+        public readonly InstructionType type;
+
+        public Instruction()
+        {
+            val = 0;
+            type = InstructionType.nothingDoing1;
+        }
+        public Instruction(InstructionType type, float val = 0)
+        {
+            this.val = val;
+            this.type = type;
+        }
 
         public override readonly bool Equals(object? obj)
         {
