@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Windows.Storage;
 
 namespace L_system.View.Elements
 {
@@ -29,6 +30,12 @@ namespace L_system.View.Elements
         {
             if (MouseButtonState.Pressed == Mouse.LeftButton)
             {
+                if (Application.Current.MainWindow.WindowState == WindowState.Maximized)
+                {
+                    Application.Current.MainWindow.Left = Application.Current.MainWindow.Width/2;
+                    Application.Current.MainWindow.Top = 0;
+                    Application.Current.MainWindow.WindowState = WindowState.Normal;
+                }
                 Application.Current.MainWindow.DragMove();
             }
         }

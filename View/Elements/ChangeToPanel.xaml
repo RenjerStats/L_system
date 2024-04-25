@@ -6,10 +6,10 @@
              xmlns:local="clr-namespace:L_system.View.Elements"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <ListView ItemsSource="{Binding Instructions}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" HorizontalContentAlignment="Stretch" SelectionMode="Single" Name="TileList" ScrollViewer.VerticalScrollBarVisibility="Auto">
+    <ListView ItemsSource="{Binding Items}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" HorizontalContentAlignment="Stretch" SelectionMode="Single" Name="TileList" ScrollViewer.VerticalScrollBarVisibility="Auto">
         <ListView.ContextMenu>
             <ContextMenu>
-                <MenuItem Header="Создать" Command="{Binding AddInstruction}"/>
+                <MenuItem Header="Создать" Command="{Binding AddInstructionCommand}"/>
                 <MenuItem Header="Очистить"/>
             </ContextMenu>
         </ListView.ContextMenu>

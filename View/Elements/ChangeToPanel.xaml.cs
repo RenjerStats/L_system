@@ -24,7 +24,7 @@ namespace L_system.View.Elements
         public ChangeToPanel()
         {
             InitializeComponent();
-            Content = new ChangeToViewModel();
+            Content = new ChangeToListViewModel();
         }
     }
 }
