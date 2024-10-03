@@ -1,18 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Documents;
-
-namespace L_system.core
+﻿namespace L_system.Model.core
 {
     public class L_system_engine(Command[] axiom, Dictionary<Command, Command[]> changeTo)
     {
-        private List<Command> axiom = new (axiom);
+        private List<Command> axiom = new(axiom);
         private readonly Dictionary<Command, Command[]> changeTo = changeTo;
 
-        public Command[] GetInstructions() => axiom.ToArray();
+        public Command[] GetCommands() => axiom.ToArray();
 
         public void Iterate()
         {
@@ -25,7 +18,7 @@ namespace L_system.core
                 {
                     if (!indexWhatAlreadyBeenUsed.Contains(i) && change == axiom[i])
                     {
-                            InsertingListWithReplacement(i, to);
+                        InsertingListWithReplacement(i, to);
                         for (int q = 0; q < to.Length; q++)
                             indexWhatAlreadyBeenUsed.Add(i + q);
                     }

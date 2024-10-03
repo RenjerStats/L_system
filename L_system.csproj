@@ -10,12 +10,18 @@
   </PropertyGroup>
 
   <ProjectExtensions><VisualStudio><UserProperties save_4saves_1json__JsonSchema="https://cdn.jsdelivr.net/npm/tsup/schema.json" /></VisualStudio></ProjectExtensions>
+
+  <ItemGroup>
+    <Compile Remove="funcForL_system\**" />
+    <EmbeddedResource Remove="funcForL_system\**" />
+    <None Remove="funcForL_system\**" />
+    <Page Remove="funcForL_system\**" />
+  </ItemGroup>
   <ItemGroup>
     <Page Include="App.xaml" />
   </ItemGroup>
-
   <ItemGroup>
-    <Folder Include="funcForL_system\" />
+    <Folder Include="ViewModel\" />
   </ItemGroup>
 
 </Project>
