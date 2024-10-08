@@ -4,7 +4,12 @@
              xmlns:local="clr-namespace:L_system"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
-        <SolidColorBrush x:Key="MainGreen" Color="#FF28A427"/>
+        <ResourceDictionary>
+            <SolidColorBrush x:Key="MainGreen" Color="#FF28A427"/>
+            
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="View/WindowChromeResourse.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </Application.Resources>
 </Application>

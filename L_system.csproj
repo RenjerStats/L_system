@@ -17,11 +17,12 @@
     <None Remove="funcForL_system\**" />
     <Page Remove="funcForL_system\**" />
   </ItemGroup>
+
   <ItemGroup>
-    <Page Include="App.xaml" />
+    <PackageReference Include="PropertyChanged.Fody" Version="4.1.0" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="ViewModel\" />
+    <Page Include="App.xaml" />
   </ItemGroup>
 
 </Project>
