@@ -11,34 +11,55 @@
         MinHeight="500" MinWidth="700"
         ResizeMode="CanResizeWithGrip"
         WindowStartupLocation="CenterScreen"
+        WindowStyle="None"
+        AllowsTransparency="True"
         >
 
     <WindowChrome.WindowChrome>
         <WindowChrome
-            ResizeBorderThickness="5"
-            CornerRadius="5"
+            ResizeBorderThickness="{Binding ResizeBorder}"
+            CaptionHeight="{Binding HeadHeight}"
+            GlassFrameThickness="0"
+            CornerRadius="0"
             />
     </WindowChrome.WindowChrome>
 
+    <Window.Resources>
+        <Style TargetType="{x:Type local:MainWindow}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Window}">
+                        <!--Main Window-->
+                        <Border x:Name="Container" Padding="5">
+                            
+                            <Grid>
+                                <Border CornerRadius="5, 5, 0, 5" Background="White">
+                                    <Border.Effect>
+                                        <DropShadowEffect ShadowDepth="8" Opacity="0.3"/>
+                                    </Border.Effect>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition/>
+                                            <ColumnDefinition Width="auto"/>
+                                            <ColumnDefinition/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="0.2*"/>
+                                            <RowDefinition/>
+                                        </Grid.RowDefinitions>
 
-    <Border BorderBrush="Black" BorderThickness="3" CornerRadius="5,5,0,5">
-        <Grid x:Name="mainGrid" Background="#FF202130">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition/>
-                <ColumnDefinition Width="auto"/>
-                <ColumnDefinition/>
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="0.2*"/>
-                <RowDefinition/>
-            </Grid.RowDefinitions>
-
-            <TextBox Grid.Row="0" Grid.Column="0" Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"/>
-            <Label Grid.Row="0" Grid.Column="2" Content="{Binding Name}"/>
-            <userControls:ChangeToPanel Grid.Row="1" />
-            <GridSplitter Grid.Row="1" Grid.Column="1" Width="10" HorizontalAlignment="Stretch"/>
-            <Canvas Grid.Column="2" Grid.Row="1"/>
-        </Grid>
-    </Border>
-
+                                        <TextBox Grid.Row="0" Grid.Column="0" Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"/>
+                                        <Label Grid.Row="0" Grid.Column="2" Content="{Binding Name}"/>
+                                        <userControls:ChangeToPanel Grid.Row="1" />
+                                        <GridSplitter Grid.Row="1" Grid.Column="1" Width="10" HorizontalAlignment="Stretch"/>
+                                        <Canvas Grid.Column="2" Grid.Row="1"/>
+                                    </Grid>
+                                </Border>
+                            </Grid>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
 </Window>
