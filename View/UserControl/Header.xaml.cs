@@ -13,14 +13,14 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace L_system.view
+namespace L_system.View
 {
     /// <summary>
-    /// Логика взаимодействия для ChangeToPanel.xaml
+    /// Логика взаимодействия для Header.xaml
     /// </summary>
-    public partial class ChangeToPanel : UserControl
+    public partial class Header : UserControl
     {
-        public ChangeToPanel()
+        public Header()
         {
             InitializeComponent();
         }

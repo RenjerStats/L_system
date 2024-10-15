@@ -5,10 +5,8 @@
              StartupUri="MainWindow.xaml">
     <Application.Resources>
         <ResourceDictionary>
-            <SolidColorBrush x:Key="MainGreen" Color="#FF28A427"/>
-            
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="View/WindowChromeResourse.xaml"/>
+                <ResourceDictionary Source="View/Resources/WindowChromeResourse.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

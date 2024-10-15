@@ -5,9 +5,9 @@ namespace L_system.ViewModel
     public class MainWindowVM : BaseVM
     {
         #region Private
-        private int radiusBorderWindow;
+        private int radiusBorderWindow = 7;
         private Window window;
-        private int shadowMarginSize = 10;
+        private int shadowMarginSize = 5;
         #endregion
 
         #region Public
@@ -21,6 +21,22 @@ namespace L_system.ViewModel
             get
             { 
                 return new Thickness(window.WindowState == WindowState.Maximized ? 0 : shadowMarginSize);
+            }
+        }
+
+        public CornerRadius RadiusBorderWindow
+        {
+            get
+            {
+                return new CornerRadius(window.WindowState == WindowState.Maximized ? 0 : radiusBorderWindow);
+            }
+        }
+
+        public CornerRadius RadiusBorderShadow
+        {
+            get
+            {
+                return new CornerRadius(window.WindowState == WindowState.Maximized ? 0 : radiusBorderWindow*2);
             }
         }
 

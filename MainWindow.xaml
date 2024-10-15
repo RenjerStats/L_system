@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:L_system"
-        xmlns:userControls="clr-namespace:L_system.view"
+        xmlns:userControls="clr-namespace:L_system.View"
         x:Name="L_system"
         mc:Ignorable="d"
         Height="450" Width="800"
@@ -20,39 +20,25 @@
             ResizeBorderThickness="{Binding ResizeBorder}"
             CaptionHeight="{Binding HeadHeight}"
             GlassFrameThickness="0"
-            CornerRadius="0"
+            CornerRadius="{Binding RadiusBorderShadow}"
             />
     </WindowChrome.WindowChrome>
+
 
     <Window.Resources>
         <Style TargetType="{x:Type local:MainWindow}">
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type Window}">
-                        <!--Main Window-->
-                        <Border x:Name="Container" Padding="5">
-                            
+                        <Border x:Name="Container" Padding="{Binding ShadowMarginSize}">
                             <Grid>
-                                <Border CornerRadius="5, 5, 0, 5" Background="White">
+                                <Border CornerRadius="{Binding RadiusBorderWindow}" Background="White">
                                     <Border.Effect>
-                                        <DropShadowEffect ShadowDepth="8" Opacity="0.3"/>
+                                        <DropShadowEffect ShadowDepth="8" Opacity="0.2"/>
                                     </Border.Effect>
+                                    <!--Main Window content-->
                                     <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition/>
-                                            <ColumnDefinition Width="auto"/>
-                                            <ColumnDefinition/>
-                                        </Grid.ColumnDefinitions>
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="0.2*"/>
-                                            <RowDefinition/>
-                                        </Grid.RowDefinitions>
-
-                                        <TextBox Grid.Row="0" Grid.Column="0" Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}"/>
-                                        <Label Grid.Row="0" Grid.Column="2" Content="{Binding Name}"/>
-                                        <userControls:ChangeToPanel Grid.Row="1" />
-                                        <GridSplitter Grid.Row="1" Grid.Column="1" Width="10" HorizontalAlignment="Stretch"/>
-                                        <Canvas Grid.Column="2" Grid.Row="1"/>
+                                        
                                     </Grid>
                                 </Border>
                             </Grid>
