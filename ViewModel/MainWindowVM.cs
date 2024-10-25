@@ -13,7 +13,7 @@ namespace L_system.ViewModel
         #region Public
         public string Name { get; set; } = "Hello World";
         public int ResizeBorder { get; set; } = 5;
-        public int HeadHeight { get; set; } = 50;
+        public int HeaderHeight { get; set; } = 50;
 
 
         public Thickness ShadowMarginSize

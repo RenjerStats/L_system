@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:L_system"
-        xmlns:userControls="clr-namespace:L_system.View"
+        xmlns:userControls="clr-namespace:L_system.View.UserControls"
         x:Name="L_system"
         mc:Ignorable="d"
         Height="450" Width="800"
@@ -38,7 +38,7 @@
                                     </Border.Effect>
                                     <!--Main Window content-->
                                     <Grid>
-                                        
+                                        <userControls:Header VerticalAlignment="Top" Height="{Binding HeaderHeight}"/>
                                     </Grid>
                                 </Border>
                             </Grid>

@@ -19,6 +19,16 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="View\Resources\Images\Chmonya.jpg" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="View\Resources\Images\Chmonya.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="PropertyChanged.Fody" Version="4.1.0" />
   </ItemGroup>
   <ItemGroup>
