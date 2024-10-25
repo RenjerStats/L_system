@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace L_system.View
+namespace L_system.View.UserControls
 {
     /// <summary>
     /// Логика взаимодействия для Header.xaml
