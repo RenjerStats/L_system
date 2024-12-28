@@ -3,43 +3,39 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
 
 namespace L_system.Model.core.Nodes
 {
-    public class InputNode<T>
+    public class InputOfNode
     {
-        private OutputNode<T> connectedOutput;
+        private Func<object> refOnValue;
 
-        public InputNode(OutputNode<T> output)
+        public InputOfNode(object baseValue)
         {
-            connectedOutput = output;
+            refOnValue = () => baseValue;
         }
 
-        public T GetValue()
+        public void SetConnection(OutputOfNode output)
         {
-            return connectedOutput.GetValue();
+            refOnValue = output.GetValue;
+        }
+
+        public object GetValue()
+        {
+            return refOnValue();
         }
     }
 
-
-    public interface IOutputNode<out T>
+    public class OutputOfNode
     {
-        T GetValue();
-    }
-    public class OutputNode<T> : IOutputNode<T>
-    {
-        private Func<T> refOnValue;
+        private Func<object> refOnValue;
 
-        public OutputNode(Func<T> refOnValue)
+        public OutputOfNode(Func<object> refOnValue)
         {
             this.refOnValue = refOnValue;
         }
-
-        public OutputNode(T value)
-        {
-            refOnValue = () => value;
-        }
-        public T GetValue()
+        public object GetValue()
         {
             return refOnValue();
         }
