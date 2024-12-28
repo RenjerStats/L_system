@@ -6,16 +6,19 @@
              xmlns:local="clr-namespace:L_system.View.UserControls"
              mc:Ignorable="d" 
              d:DesignHeight="97.899" d:DesignWidth="800">
-    <Grid Height="{Binding Height}" Background="Aqua">
-        <Image Source="\View\Resources\Images\Chmonya.jpg" HorizontalAlignment="Left"/>
+    <Grid Background="Aqua">
+        <Button Padding="5" Style="{StaticResource HoverLess}" WindowChrome.IsHitTestVisibleInChrome="True" Command="{Binding MenuCommand}" HorizontalAlignment="Left">
+            <Image Source="\View\Resources\Images\Chmonya.jpg"/>
+        </Button>
+        <TextBlock Text="L system pro max" VerticalAlignment="Center" HorizontalAlignment="Center"/>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button Style="{StaticResource HoverLess}" Padding="5">
+            <Button Padding="5">
                 -
             </Button>
-            <Button Style="{StaticResource HoverLess}" Padding="5">
+            <Button Padding="5">
                 #
             </Button>
-            <Button Style="{StaticResource HoverLess}" Padding="5">
+            <Button Padding="5">
                 X
             </Button>
         </StackPanel>

@@ -18,9 +18,9 @@
     <WindowChrome.WindowChrome>
         <WindowChrome
             ResizeBorderThickness="{Binding ResizeBorder}"
-            CaptionHeight="{Binding HeadHeight}"
+            CaptionHeight="{Binding HeaderHeight}"
             GlassFrameThickness="0"
-            CornerRadius="{Binding RadiusBorderShadow}"
+            CornerRadius="{Binding RadiusBorderWindow}"
             />
     </WindowChrome.WindowChrome>
 
@@ -32,13 +32,28 @@
                     <ControlTemplate TargetType="{x:Type Window}">
                         <Border x:Name="Container" Padding="{Binding ShadowMarginSize}">
                             <Grid>
-                                <Border CornerRadius="{Binding RadiusBorderWindow}" Background="White">
+                                <Border CornerRadius="{Binding RadiusBorderShadow}" Background="White">
                                     <Border.Effect>
                                         <DropShadowEffect ShadowDepth="8" Opacity="0.2"/>
                                     </Border.Effect>
                                     <!--Main Window content-->
                                     <Grid>
-                                        <userControls:Header VerticalAlignment="Top" Height="{Binding HeaderHeight}"/>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="{Binding HeaderHeight}"/>
+                                            <RowDefinition Height="auto"/>
+                                            <RowDefinition Height="*"/>
+                                        </Grid.RowDefinitions>
+                                        
+                                        <userControls:Header Grid.Row="0"/>
+                                        <Grid Grid.Row="2">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="{Binding BarWidth}"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <Button Background="Bisque" Grid.Column="0"/>
+                                            <Button Background="Green" Grid.Column="1"/>
+                                        </Grid>
                                     </Grid>
                                 </Border>
                             </Grid>

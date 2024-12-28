@@ -5,16 +5,26 @@ namespace L_system.ViewModel
     public class MainWindowVM : BaseVM
     {
         #region Private
-        private int radiusBorderWindow = 7;
         private Window window;
-        private int shadowMarginSize = 5;
+
+        private int resizeBorder = 5;
+        private int headerHeight = 50;
+        private int shadowMarginSize = 10;
+        private int radiusBorderWindow = 6;
         #endregion
 
         #region Public
         public string Name { get; set; } = "Hello World";
-        public int ResizeBorder { get; set; } = 5;
-        public int HeaderHeight { get; set; } = 50;
 
+        public Thickness ResizeBorder
+        {
+            get { return new Thickness(resizeBorder + shadowMarginSize); }
+        }
+
+        public double HeaderHeight
+        {
+            get { return headerHeight; }
+        }
 
         public Thickness ShadowMarginSize
         {
