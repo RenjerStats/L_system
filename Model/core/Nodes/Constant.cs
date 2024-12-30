@@ -8,12 +8,13 @@ namespace L_system.Model.core.Nodes
 {
     public class NodeConstant : Node
     {
-        public object Value;
+        public object Value { get; set; }
 
         public NodeConstant(object value)
         {
             Value = value;
             Outputs = [new OutputOfNode(() => Value)];
+            Inputs = [];
         }
     }
 }

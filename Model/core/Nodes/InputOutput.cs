@@ -16,7 +16,7 @@ namespace L_system.Model.core.Nodes
             refOnValue = () => baseValue;
         }
 
-        public void SetConnection(OutputOfNode output)
+        public InputOfNode(OutputOfNode output)
         {
             refOnValue = output.GetValue;
         }

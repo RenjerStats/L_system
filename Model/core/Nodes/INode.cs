@@ -14,25 +14,36 @@ namespace L_system.Model.core.Nodes
 
     public class Node : INode
     {
+        protected InputOfNode[] defaultInputs;
         public InputOfNode[] Inputs { get; set; }
         public OutputOfNode[] Outputs { get; set; }
 
-        public bool TryConnect(int inputIndex, INode prefNode, int outputIndex)
+
+        public void ResetInputToDefault(int inputIndex)
+        {
+            Inputs[inputIndex] = defaultInputs[inputIndex];
+        }
+        public void ResetInputsToDefault()
+        {
+            Inputs = (InputOfNode[]) defaultInputs.Clone();
+        }
+
+        public bool CanConnect(int inputIndex, INode prefNode, int outputIndex)
         {
             if (inputIndex < 0 || inputIndex >= Inputs.Length ||
-            outputIndex < 0 || outputIndex >= prefNode.Outputs.Length)
+                    outputIndex < 0 || outputIndex >= prefNode.Outputs.Length)
                 return false;
 
             var inputType = Inputs[inputIndex].GetValue().GetType();
             var outputType = prefNode.Outputs[outputIndex].GetValue().GetType();
 
-            if (inputType.IsAssignableFrom(outputType))
-            {
-                Inputs[inputIndex].SetConnection(prefNode.Outputs[outputIndex]);
-                return true;
-            }
+            return inputType.IsAssignableFrom(outputType);
+        }
+        public void Connect(int inputIndex, INode prefNode, int outputIndex)
+        {
+            if (!CanConnect(inputIndex, prefNode, outputIndex)) throw new ArgumentException();
 
-            return false;
+            Inputs[inputIndex] = new InputOfNode(prefNode.Outputs[outputIndex]);
         }
     }
 }
