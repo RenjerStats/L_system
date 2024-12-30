@@ -17,24 +17,23 @@ namespace L_system.View
             Grid form = new Grid();
             for (int i = 0; i < 3; i++)
                 form.RowDefinitions.Add(new RowDefinition());
-            form.RowDefinitions[0].Height = new GridLength(0.10, GridUnitType.Star);
+            form.RowDefinitions[0].Height = new GridLength(20);
             form.RowDefinitions[1].Height = new GridLength(0.45, GridUnitType.Star);
             form.RowDefinitions[2].Height = new GridLength(0.45, GridUnitType.Star);
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < 4; i++)
                 form.ColumnDefinitions.Add(new ColumnDefinition());
             bool isInputEmpty = core.GetNameOfInputs().Length == 0;
-            form.ColumnDefinitions[0].Width = new GridLength(isInputEmpty ? 0 : 0.10, GridUnitType.Star);
-            form.ColumnDefinitions[1].Width = new GridLength(isInputEmpty ? 0 : 0.15, GridUnitType.Star);
-            form.ColumnDefinitions[2].Width = new GridLength(0.50, GridUnitType.Star);
-            form.ColumnDefinitions[3].Width = new GridLength(0.15, GridUnitType.Star);
-            form.ColumnDefinitions[4].Width = new GridLength(0.10, GridUnitType.Star);
+            form.ColumnDefinitions[0].Width = new GridLength(isInputEmpty ? 0 : 15);
+            form.ColumnDefinitions[1].Width = new GridLength(isInputEmpty ? 0 : 0.45, GridUnitType.Star);
+            form.ColumnDefinitions[2].Width = new GridLength(0.45, GridUnitType.Star);
+            form.ColumnDefinitions[3].Width = new GridLength(15);
 
             TextBox name = CreateSimpleText("Node");
             name.Padding = new Thickness(0, 5, 0, 0);
 
             Grid.SetRow(name, 0);
             Grid.SetColumn(name, 0);
-            Grid.SetColumnSpan(name, 4);
+            Grid.SetColumnSpan(name, 3);
             form.Children.Add(name);
 
             Button button = new Button();
@@ -43,7 +42,7 @@ namespace L_system.View
             button.Content = ">";
 
             Grid.SetRow(button, 0);
-            Grid.SetColumn(button, 4);
+            Grid.SetColumn(button, 3);
             form.Children.Add(button);
 
 
@@ -69,7 +68,7 @@ namespace L_system.View
 
             for (int i = 0; i < core.GetNameOfInputs().Length; i++)
             {
-                TextBox nameInput = CreateSimpleText(core.GetNameOfInputs()[i]);
+                TextBox nameInput = CreateSimpleText(core.GetNameOfInputs()[i], HorizontalAlignment.Left);
                 nameInput.VerticalAlignment = VerticalAlignment.Center;
                 Grid.SetRow(nameInput, i);
                 Grid.SetColumn(nameInput, 0);
@@ -91,7 +90,7 @@ namespace L_system.View
                 outputCircles.Children.Add(output);
             }
             Grid.SetRow(outputCircles, 1);
-            Grid.SetColumn(outputCircles, 4);
+            Grid.SetColumn(outputCircles, 3);
             form.Children.Add(outputCircles);
 
 
@@ -102,31 +101,25 @@ namespace L_system.View
 
             for (int i = 0; i < core.GetNameOfOutputs().Length; i++)
             {
-                TextBox nameOutput = CreateSimpleText(core.GetNameOfOutputs()[i]);
+                TextBox nameOutput = CreateSimpleText(core.GetNameOfOutputs()[i], HorizontalAlignment.Right);
                 nameOutput.VerticalAlignment = VerticalAlignment.Center;
                 Grid.SetRow(nameOutput, i);
                 Grid.SetColumn(nameOutput, 0);
                 outputNames.Children.Add(nameOutput);
             }
             Grid.SetRow(outputNames, 1);
-            Grid.SetColumn(outputNames, 3);
+            Grid.SetColumn(outputNames, 2);
             form.Children.Add(outputNames);
-
-
-            TextBox info = CreateSimpleText("Здесь будет описание");
-            Grid.SetRow(info, 1);
-            Grid.SetColumn(info, 2);
-            form.Children.Add(info);
 
             TextBox preview = CreateSimpleText("Здесь будет превью");
             Grid.SetRow(preview, 2);
-            Grid.SetColumnSpan(preview, 5);
+            Grid.SetColumnSpan(preview, 4);
             form.Children.Add(preview);
 
             face = new Border()
             {
-                Width = 250,
-                Height = 200,
+                Width = 200,
+                Height = 150,
                 Background = (Brush)new BrushConverter().ConvertFrom("#FF333333"),
                 CornerRadius = new CornerRadius(10),
                 BorderBrush = Brushes.Black,
@@ -138,7 +131,7 @@ namespace L_system.View
             Canvas.SetTop(face, position.Y);
         }
 
-        private static TextBox CreateSimpleText(string content)
+        private static TextBox CreateSimpleText(string content, HorizontalAlignment alignment = HorizontalAlignment.Center)
         {
             TextBox name = new TextBox();
             name.Foreground = Brushes.White;
@@ -147,8 +140,8 @@ namespace L_system.View
             name.Background = Brushes.Transparent;
             name.BorderBrush = Brushes.Transparent;
             name.Text = content;
+            name.HorizontalContentAlignment = alignment;
             name.IsEnabled = false;
-            name.HorizontalContentAlignment = HorizontalAlignment.Center;
             return name;
         }
 
