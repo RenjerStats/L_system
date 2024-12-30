@@ -3,6 +3,7 @@ using L_system.ViewModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Shapes;
 
 namespace L_system.View
 {
@@ -28,10 +29,8 @@ namespace L_system.View
             form.ColumnDefinitions[3].Width = new GridLength(0.15, GridUnitType.Star);
             form.ColumnDefinitions[4].Width = new GridLength(0.10, GridUnitType.Star);
 
-            TextBox name = new TextBox();
-            name.Text = "Node";
-            name.IsEnabled = false;
-            name.HorizontalContentAlignment = HorizontalAlignment.Center;
+            TextBox name = CreateSimpleText("Node");
+            name.Padding = new Thickness(0, 5, 0, 0);
 
             Grid.SetRow(name, 0);
             Grid.SetColumn(name, 0);
@@ -39,6 +38,8 @@ namespace L_system.View
             form.Children.Add(name);
 
             Button button = new Button();
+            button.Background = Brushes.Transparent;
+            button.BorderBrush = Brushes.Transparent;
             button.Content = ">";
 
             Grid.SetRow(button, 0);
@@ -53,10 +54,7 @@ namespace L_system.View
 
             for (int i = 0; i < core.GetNameOfInputs().Length; i++)
             {
-                Button input = new Button();
-                input.Content = "o";
-                Grid.SetRow(input, i);
-                Grid.SetColumn(input, 0);
+                Ellipse input = CreatePoint(i, 0, HorizontalAlignment.Left);
                 inputCircles.Children.Add(input);
             }
             Grid.SetRow(inputCircles, 1);
@@ -71,10 +69,8 @@ namespace L_system.View
 
             for (int i = 0; i < core.GetNameOfInputs().Length; i++)
             {
-                TextBox nameInput = new TextBox();
-                nameInput.Text = core.GetNameOfInputs()[i];
-                nameInput.IsEnabled = false;
-                nameInput.VerticalContentAlignment = VerticalAlignment.Center;
+                TextBox nameInput = CreateSimpleText(core.GetNameOfInputs()[i]);
+                nameInput.VerticalAlignment = VerticalAlignment.Center;
                 Grid.SetRow(nameInput, i);
                 Grid.SetColumn(nameInput, 0);
                 inputNames.Children.Add(nameInput);
@@ -91,10 +87,7 @@ namespace L_system.View
 
             for (int i = 0; i < core.GetNameOfOutputs().Length; i++)
             {
-                Button output = new Button();
-                output.Content = "o";
-                Grid.SetRow(output, i);
-                Grid.SetColumn(output, 0);
+                Ellipse output = CreatePoint(i, 0, HorizontalAlignment.Right);
                 outputCircles.Children.Add(output);
             }
             Grid.SetRow(outputCircles, 1);
@@ -109,10 +102,8 @@ namespace L_system.View
 
             for (int i = 0; i < core.GetNameOfOutputs().Length; i++)
             {
-                TextBox nameOutput = new TextBox();
-                nameOutput.Text = core.GetNameOfOutputs()[i];
-                nameOutput.IsEnabled = false;
-                nameOutput.VerticalContentAlignment = VerticalAlignment.Center;
+                TextBox nameOutput = CreateSimpleText(core.GetNameOfOutputs()[i]);
+                nameOutput.VerticalAlignment = VerticalAlignment.Center;
                 Grid.SetRow(nameOutput, i);
                 Grid.SetColumn(nameOutput, 0);
                 outputNames.Children.Add(nameOutput);
@@ -122,16 +113,12 @@ namespace L_system.View
             form.Children.Add(outputNames);
 
 
-            TextBox info = new TextBox();
-            info.Text = "Тут будет описание";
-            info.IsEnabled = false;
+            TextBox info = CreateSimpleText("Здесь будет описание");
             Grid.SetRow(info, 1);
             Grid.SetColumn(info, 2);
             form.Children.Add(info);
 
-            TextBox preview = new TextBox();
-            preview.Text = "Тут будет превью";
-            preview.IsEnabled = false;
+            TextBox preview = CreateSimpleText("Здесь будет превью");
             Grid.SetRow(preview, 2);
             Grid.SetColumnSpan(preview, 5);
             form.Children.Add(preview);
@@ -140,15 +127,41 @@ namespace L_system.View
             {
                 Width = 250,
                 Height = 200,
-                Background = Brushes.LightBlue,
+                Background = (Brush)new BrushConverter().ConvertFrom("#FF333333"),
                 CornerRadius = new CornerRadius(10),
-                BorderBrush = Brushes.DarkBlue,
+                BorderBrush = Brushes.Black,
                 BorderThickness = new Thickness(2),
                 Child = form
             };
 
             Canvas.SetLeft(face, position.X);
             Canvas.SetTop(face, position.Y);
+        }
+
+        private static TextBox CreateSimpleText(string content)
+        {
+            TextBox name = new TextBox();
+            name.Foreground = Brushes.White;
+            name.FontFamily = new FontFamily("Arial");
+            name.FontSize = 10;
+            name.Background = Brushes.Transparent;
+            name.BorderBrush = Brushes.Transparent;
+            name.Text = content;
+            name.IsEnabled = false;
+            name.HorizontalContentAlignment = HorizontalAlignment.Center;
+            return name;
+        }
+
+        private static Ellipse CreatePoint(int row, int column, HorizontalAlignment alignment)
+        {
+            Ellipse point = new Ellipse();
+            point.Stroke = Brushes.White; point.Fill = Brushes.White;
+            point.Width = 10;
+            point.Height = 10;
+            point.HorizontalAlignment = alignment;
+            Grid.SetRow(point, row);
+            Grid.SetColumn(point, column);
+            return point;
         }
     }
 }

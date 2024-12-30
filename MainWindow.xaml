@@ -13,5 +13,5 @@
         WindowStartupLocation="CenterScreen"
         >
 
-    <Canvas Name="NodeCanvas" Background="LightGray"/>
+    <Canvas Name="NodeCanvas" Background="MidnightBlue"/>
 </Window>
