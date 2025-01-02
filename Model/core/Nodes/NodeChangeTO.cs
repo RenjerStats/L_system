@@ -9,6 +9,9 @@
             InputOfNode to = new InputOfNode(new Command[] { new Command(CommandType.nothingDoing1) });
             Inputs = [axiom, change, to];
             Outputs = [new OutputOfNode(GetResult)];
+            NameOfNode = "Замена";
+            NameOfInputs = ["Команды", "Заменяемое", "Заменитель"];
+            NameOfOutputs = ["Результат"];
         }
 
         public Command[] GetResult()

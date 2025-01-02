@@ -22,6 +22,7 @@ namespace L_system
             NodeV node2 = new NodeV(new(270, 100), new NodeVM(new NodePlus()));
             NodeV node3 = new NodeV(new(10, 100), new NodeVM(new NodeConstant(5D)));
 
+
             NodeCanvas.Children.Add(node3.face);
             NodeCanvas.Children.Add(node2.face);
             NodeCanvas.Children.Add(node1.face);

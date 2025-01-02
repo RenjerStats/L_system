@@ -10,6 +10,9 @@ namespace L_system.Model.core.Nodes
     {
         public InputOfNode[] Inputs { get; set; }
         public OutputOfNode[] Outputs { get; set; }
+        public string[] NameOfInputs { get; set; }
+        public string[] NameOfOutputs { get; set; }
+        public string NameOfNode {  get; set; }
     }
 
     public class Node : INode
@@ -17,6 +20,9 @@ namespace L_system.Model.core.Nodes
         protected InputOfNode[] defaultInputs;
         public InputOfNode[] Inputs { get; set; }
         public OutputOfNode[] Outputs { get; set; }
+        public string[] NameOfInputs { get; set; }
+        public string[] NameOfOutputs { get; set; }
+        public string NameOfNode { get; set; }
 
 
         public void ResetInputToDefault(int inputIndex)

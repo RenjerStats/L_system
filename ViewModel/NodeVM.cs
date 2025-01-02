@@ -14,8 +14,6 @@ namespace L_system.ViewModel
         private Node nodeCore;
         private ConnectionVM[] connectionVMToInputs;
 
-        public bool miniSize { get;private set; }
-
         public NodeVM(Node nodeCore)
         {
             this.nodeCore = nodeCore;
@@ -43,45 +41,43 @@ namespace L_system.ViewModel
             return connectionVMToInputs[inputIndex];
         }
 
+        public int GetInputsCount()
+        {
+            return nodeCore.NameOfInputs == null? 0 : nodeCore.NameOfInputs.Length;
+        }
+
+        public int GetOutputsCount()
+        {
+            return nodeCore.NameOfOutputs == null ? 0 : nodeCore.NameOfOutputs.Length;
+        }
         public string[] GetNameOfInputs()
         {
-            string[] result = new string[nodeCore.Inputs.Length];
-
-            for (int i = 0; i < result.Length; i++)
-            {
-                result[i] = GetNameOfType(nodeCore.Inputs[i].GetValue());
-            }
-
-            return result;
+            return nodeCore.NameOfInputs;
         }
-
         public string[] GetNameOfOutputs()
         {
-            string[] result = new string[nodeCore.Outputs.Length];
-
-            for (int i = 0; i < result.Length; i++)
-            {
-                result[i] = GetNameOfType(nodeCore.Outputs[i].GetValue());
-            }
-
-            return result;
+            return nodeCore.NameOfOutputs;
         }
-
-        private string GetNameOfType(object value)
+        public string GetNameOfNode()
         {
-            switch (value.GetType().Name)
-            {
-                case "Double":
-                    return "число";
-                case "String":
-                    return "строка";
-                case "Command[]":
-                    return "команды";
-                case "Command":
-                    return "команда";
-                default:
-                    return "неизвестный тип";
-            }
+            return nodeCore.NameOfNode;
         }
+
+        //private string GetNameOfType(object value)
+        //{
+        //    switch (value.GetType().Name)
+        //    {
+        //        case "Double":
+        //            return "число";
+        //        case "String":
+        //            return "строка";
+        //        case "Command[]":
+        //            return "команды";
+        //        case "Command":
+        //            return "команда";
+        //        default:
+        //            return "неизвестный тип";
+        //    }
+        //}
     }
 }

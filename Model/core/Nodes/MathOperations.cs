@@ -13,6 +13,9 @@ namespace L_system.Model.core.Nodes
             defaultInputs = [new InputOfNode(1.0D), new InputOfNode(2.0D)];
             ResetInputsToDefault();
             Outputs = [new OutputOfNode(() => (double)Inputs[0].GetValue() + (double)Inputs[1].GetValue())];
+            NameOfNode = "Сложение";
+            NameOfInputs = ["Слагаемое", "Слагаемое"];
+            NameOfOutputs = ["Сумма"];
         }
     }
     internal class NodeSub : Node
@@ -22,6 +25,9 @@ namespace L_system.Model.core.Nodes
             defaultInputs = [new InputOfNode(1.0D), new InputOfNode(2.0D)];
             ResetInputsToDefault();
             Outputs = [new OutputOfNode(() => (double)Inputs[0].GetValue() - (double)Inputs[1].GetValue())];
+            NameOfNode = "Вычитание";
+            NameOfInputs = ["Уменьшаемое", "Вычитаемое"];
+            NameOfOutputs = ["Разность"];
         }
     }
     internal class NodeMult : Node
@@ -31,6 +37,9 @@ namespace L_system.Model.core.Nodes
             defaultInputs = [new InputOfNode(1.0D), new InputOfNode(2.0D)];
             ResetInputsToDefault();
             Outputs = [new OutputOfNode(() => (double)Inputs[0].GetValue() * (double)Inputs[1].GetValue())];
+            NameOfNode = "Умножение";
+            NameOfInputs = ["Множитель", "Множитель"];
+            NameOfOutputs = ["Произведение"];
         }
     }
     internal class NodeDiv : Node
@@ -40,6 +49,9 @@ namespace L_system.Model.core.Nodes
             defaultInputs = [new InputOfNode(1.0D), new InputOfNode(2.0D)];
             ResetInputsToDefault();
             Outputs = [new OutputOfNode(() => (double)Inputs[0].GetValue() / (double)Inputs[1].GetValue())];
+            NameOfNode = "Деление";
+            NameOfInputs = ["Делимое", "Делитель"];
+            NameOfOutputs = ["Частное"];
         }
     }
 

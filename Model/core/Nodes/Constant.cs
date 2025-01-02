@@ -14,6 +14,8 @@ namespace L_system.Model.core.Nodes
         {
             Value = value;
             Outputs = [new OutputOfNode(() => Value)];
+            NameOfOutputs = ["Значение"];
+            NameOfNode = "Константа";
             Inputs = [];
         }
     }

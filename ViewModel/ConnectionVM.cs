@@ -6,6 +6,46 @@ using System.Threading.Tasks;
 
 namespace L_system.ViewModel
 {
+    public static class ConnectionSystem
+    {
+        private static NodeVM? OutputNode;
+        private static NodeVM? InputNode;
+
+        private static List<ConnectionVM> connections = new List<ConnectionVM>();
+
+        private static int OutputIndex;
+        private static int InputIndex;
+
+        public static void SetInput(NodeVM inputNode, int inputIndex)
+        {
+            InputNode = inputNode;
+            InputIndex = inputIndex;
+        }
+        public static void SetOutput(NodeVM outputNode, int outputIndex)
+        {
+            OutputNode = outputNode;
+            OutputIndex = outputIndex;
+        }
+
+        public static void StartNewConnection()
+        {
+            OutputNode = null;
+            InputNode = null;
+        }
+
+        public static void EndNewConnection()
+        {
+            if (OutputNode != null && InputNode != null && InputNode != OutputNode)
+            {
+                if (ConnectionVM.CanCreateConnection(OutputNode, OutputIndex, InputNode, InputIndex))
+                {
+                    connections.Add(new ConnectionVM(OutputNode, OutputIndex, InputNode, InputIndex));
+
+                }
+            }
+        }
+    }
+
     public class ConnectionVM
     {
         private NodeVM outputNode;
@@ -19,7 +59,7 @@ namespace L_system.ViewModel
             return inputNode.CanCreateConnection(outputIndex, inputNode, inputIndex);
         }
 
-        public ConnectionVM(NodeVM outputNode, NodeVM inputNode, int outputIndex, int inputIndex)
+        public ConnectionVM(NodeVM outputNode, int outputIndex, NodeVM inputNode, int inputIndex)
         {
             this.outputNode = outputNode;
             this.inputNode = inputNode;
