@@ -17,20 +17,30 @@ namespace L_system.View
     public class ConnectionV
     {
         public ConnectionVM connectionCore;
-        public Line face;
+        public Path face;
 
         public ConnectionV(ConnectionVM connectionCore, Ellipse outputPoint, Ellipse inputPoint, Canvas canvas)
         {
             this.connectionCore = connectionCore;
 
-            face = new Line();
-            face.Stroke = Brushes.White;
-            face.Fill = Brushes.White;
-            face.StrokeThickness = 10;
+            Point startPoint = outputPoint.TranslatePoint(new Point(0, 5), canvas);
+            Point endPoint = inputPoint.TranslatePoint(new Point(0, 5), canvas);
 
-            Point relativeLocation = outputPoint.TranslatePoint(new Point(0, 0), canvas);
+            Point controlPoint1 = new Point(startPoint.X + 50, startPoint.Y);
+            Point controlPoint2 = new Point(endPoint.X - 50, endPoint.Y);
 
-            Point relativeLocation2 = inputPoint.TranslatePoint(new Point(0, 0), canvas);
+            PathGeometry geometry = new PathGeometry();
+            PathFigure figure = new PathFigure { StartPoint = startPoint };
+            BezierSegment bezierSegment = new BezierSegment(controlPoint1, controlPoint2, endPoint, true);
+            figure.Segments.Add(bezierSegment);
+            geometry.Figures.Add(figure);
+
+            Path face = new Path
+            {
+                Stroke = Brushes.White,
+                StrokeThickness = 4,
+                Data = geometry
+            };
 
             canvas.Children.Add(face);
         }

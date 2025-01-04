@@ -56,7 +56,7 @@ namespace L_system.ViewModel
 
         public static bool CanCreateConnection(NodeVM outputNode, int outputIndex, NodeVM inputNode, int inputIndex)
         {
-            return inputNode.CanCreateConnection(outputIndex, inputNode, inputIndex);
+            return inputNode.CanCreateConnection(inputIndex, outputNode, outputIndex);
         }
 
         public ConnectionVM(NodeVM outputNode, int outputIndex, NodeVM inputNode, int inputIndex)
@@ -66,7 +66,7 @@ namespace L_system.ViewModel
             this.inputIndex = inputIndex;
             this.outputIndex = outputIndex;
 
-            inputNode.CreateConnection(outputIndex, inputNode, inputIndex, this);
+            inputNode.CreateConnection(inputIndex, outputNode, outputIndex, this);
         }
 
         ~ConnectionVM()

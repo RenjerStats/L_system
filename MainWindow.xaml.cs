@@ -18,14 +18,18 @@ namespace L_system
         public MainWindow()
         {
             InitializeComponent();
-            NodeV node1 = new NodeV(new(530, 100), new NodeVM(new NodeChangeTO()));
-            NodeV node2 = new NodeV(new(270, 100), new NodeVM(new NodePlus()));
-            NodeV node3 = new NodeV(new(10, 100), new NodeVM(new NodeConstant(5D)));
 
+            for (int i = 0; i < 2; i++)
+            {
+                NodeV nodeSum = new NodeV(new(100 + 200*i, 50), new NodeVM(new NodePlus()));
+                NodeCanvas.Children.Add(nodeSum.face);
+            }
+            for (int i = 0; i < 3; i++)
+            {
+                NodeV nodeConst = new NodeV(new(100 + 200*i, 250), new NodeVM(new NodeConstant(5D)));
+                NodeCanvas.Children.Add(nodeConst.face);
+            }
 
-            NodeCanvas.Children.Add(node3.face);
-            NodeCanvas.Children.Add(node2.face);
-            NodeCanvas.Children.Add(node1.face);
         }
     }
 }

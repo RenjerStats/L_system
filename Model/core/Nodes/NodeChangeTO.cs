@@ -4,10 +4,11 @@
     {
         public NodeChangeTO()
         {
-            InputOfNode axiom = new InputOfNode(new Command[] { new Command(CommandType.nothingDoing1) });
-            InputOfNode change = new InputOfNode(new Command(CommandType.nothingDoing1) );
-            InputOfNode to = new InputOfNode(new Command[] { new Command(CommandType.nothingDoing1) });
-            Inputs = [axiom, change, to];
+            object axiom = new Command[] { new Command(CommandType.nothingDoing1) };
+            object change = new Command(CommandType.nothingDoing1);
+            object to = new Command[] { new Command(CommandType.nothingDoing1) };
+            Inputs = new InputOfNode[3];
+            defaultInputs = [axiom, change, to];
             Outputs = [new OutputOfNode(GetResult)];
             NameOfNode = "Замена";
             NameOfInputs = ["Команды", "Заменяемое", "Заменитель"];
@@ -16,8 +17,11 @@
 
         public Command[] GetResult()
         {
-            L_system_engine engine = new L_system_engine((Command[])Inputs[0].GetValue(),
-                                         EngineTools.ToDictionary([(Command)Inputs[1].GetValue()], [(Command[])Inputs[2].GetValue()]));
+            object axiom = Inputs[0] == null? defaultInputs[0] : Inputs[0].GetValue();
+            object change = Inputs[1] == null? defaultInputs[1] : Inputs[1].GetValue();
+            object to = Inputs[2] == null? defaultInputs[2] : Inputs[2].GetValue();
+            L_system_engine engine = new L_system_engine((Command[])axiom,
+                                         EngineTools.ToDictionary([(Command)change], [(Command[])to ]));
 
             engine.Iterate();
 

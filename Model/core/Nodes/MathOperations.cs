@@ -10,48 +10,69 @@ namespace L_system.Model.core.Nodes
     {
         public NodePlus()
         {
-            defaultInputs = [new InputOfNode(1.0D), new InputOfNode(2.0D)];
-            ResetInputsToDefault();
-            Outputs = [new OutputOfNode(() => (double)Inputs[0].GetValue() + (double)Inputs[1].GetValue())];
+            Inputs = new InputOfNode[2];
+            defaultInputs = [1.0D, 2.0D];
+            Outputs = [new OutputOfNode(GetOutput)]; // самозацикливание
             NameOfNode = "Сложение";
             NameOfInputs = ["Слагаемое", "Слагаемое"];
             NameOfOutputs = ["Сумма"];
         }
+        private object GetOutput()
+        {
+            double firstValue = Inputs[0] ==  null ? (double)defaultInputs[0] : (double)Inputs[0].GetValue();
+            double secondValue = Inputs[1] == null ? (double)defaultInputs[1] : (double)Inputs[1].GetValue();
+            return firstValue + secondValue;
+        } 
     }
     internal class NodeSub : Node
     {
         public NodeSub()
         {
-            defaultInputs = [new InputOfNode(1.0D), new InputOfNode(2.0D)];
-            ResetInputsToDefault();
-            Outputs = [new OutputOfNode(() => (double)Inputs[0].GetValue() - (double)Inputs[1].GetValue())];
+            defaultInputs = [1.0D, 2.0D];
+            Outputs = [new OutputOfNode(GetOutput)];
             NameOfNode = "Вычитание";
             NameOfInputs = ["Уменьшаемое", "Вычитаемое"];
             NameOfOutputs = ["Разность"];
+        }
+        private object GetOutput()
+        {
+            double firstValue = Inputs[0] == null ? (double)defaultInputs[0] : (double)Inputs[0].GetValue();
+            double secondValue = Inputs[1] == null ? (double)defaultInputs[1] : (double)Inputs[1].GetValue();
+            return firstValue - secondValue;
         }
     }
     internal class NodeMult : Node
     {
         public NodeMult()
         {
-            defaultInputs = [new InputOfNode(1.0D), new InputOfNode(2.0D)];
-            ResetInputsToDefault();
-            Outputs = [new OutputOfNode(() => (double)Inputs[0].GetValue() * (double)Inputs[1].GetValue())];
+            defaultInputs = [1.0D, 2.0D];
+            Outputs = [new OutputOfNode(GetOutput)];
             NameOfNode = "Умножение";
             NameOfInputs = ["Множитель", "Множитель"];
             NameOfOutputs = ["Произведение"];
+        }
+        private object GetOutput()
+        {
+            double firstValue = Inputs[0] == null ? (double)defaultInputs[0] : (double)Inputs[0].GetValue();
+            double secondValue = Inputs[1] == null ? (double)defaultInputs[1] : (double)Inputs[1].GetValue();
+            return firstValue * secondValue;
         }
     }
     internal class NodeDiv : Node
     {
         public NodeDiv()
         {
-            defaultInputs = [new InputOfNode(1.0D), new InputOfNode(2.0D)];
-            ResetInputsToDefault();
-            Outputs = [new OutputOfNode(() => (double)Inputs[0].GetValue() / (double)Inputs[1].GetValue())];
+            defaultInputs = [1.0D, 2.0D];
+            Outputs = [new OutputOfNode(GetOutput)];
             NameOfNode = "Деление";
             NameOfInputs = ["Делимое", "Делитель"];
             NameOfOutputs = ["Частное"];
+        }
+        private object GetOutput()
+        {
+            double firstValue = Inputs[0] == null ? (double)defaultInputs[0] : (double)Inputs[0].GetValue();
+            double secondValue = Inputs[1] == null ? (double)defaultInputs[1] : (double)Inputs[1].GetValue();
+            return firstValue / secondValue;
         }
     }
 

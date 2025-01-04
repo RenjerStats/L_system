@@ -17,22 +17,12 @@ namespace L_system.Model.core.Nodes
 
     public class Node : INode
     {
-        protected InputOfNode[] defaultInputs;
+        protected object[] defaultInputs;
         public InputOfNode[] Inputs { get; set; }
         public OutputOfNode[] Outputs { get; set; }
         public string[] NameOfInputs { get; set; }
         public string[] NameOfOutputs { get; set; }
         public string NameOfNode { get; set; }
-
-
-        public void ResetInputToDefault(int inputIndex)
-        {
-            Inputs[inputIndex] = defaultInputs[inputIndex];
-        }
-        public void ResetInputsToDefault()
-        {
-            Inputs = (InputOfNode[]) defaultInputs.Clone();
-        }
 
         public bool CanConnect(int inputIndex, INode prefNode, int outputIndex)
         {
@@ -40,7 +30,7 @@ namespace L_system.Model.core.Nodes
                     outputIndex < 0 || outputIndex >= prefNode.Outputs.Length)
                 return false;
 
-            var inputType = Inputs[inputIndex].GetValue().GetType();
+            var inputType = defaultInputs[inputIndex].GetType();
             var outputType = prefNode.Outputs[outputIndex].GetValue().GetType();
 
             return inputType.IsAssignableFrom(outputType);
@@ -50,6 +40,11 @@ namespace L_system.Model.core.Nodes
             if (!CanConnect(inputIndex, prefNode, outputIndex)) throw new ArgumentException();
 
             Inputs[inputIndex] = new InputOfNode(prefNode.Outputs[outputIndex]);
+        }
+
+        internal void ResetInputToDefault(int inputIndex)
+        {
+            Inputs[inputIndex] = null;
         }
     }
 }
