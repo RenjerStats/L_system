@@ -1,9 +1,5 @@
 ﻿using L_system.ViewModel;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows;
 using System.Windows.Data;
@@ -11,23 +7,58 @@ using System.Windows.Shapes;
 using System.Globalization;
 using L_system.Model.core.Nodes;
 using System.Windows.Media;
+using System.ComponentModel;
 
 namespace L_system.View
 {
     public class ConnectionV
     {
         public ConnectionVM connectionCore;
+        private Ellipse outputPoint;
+        private Ellipse inputPoint;
+        private Canvas canvas;
         public Path face;
 
         public ConnectionV(ConnectionVM connectionCore, Ellipse outputPoint, Ellipse inputPoint, Canvas canvas)
         {
             this.connectionCore = connectionCore;
+            this.outputPoint = outputPoint;
+            this.inputPoint = inputPoint;
+            this.canvas = canvas;
+            face = GetLine();
+            canvas.Children.Add(face);
 
-            Point startPoint = outputPoint.TranslatePoint(new Point(0, 5), canvas);
-            Point endPoint = inputPoint.TranslatePoint(new Point(0, 5), canvas);
+            // Подписываемся на события изменения позиций
+            RegisterPositionChanged(outputPoint);
+            RegisterPositionChanged(inputPoint);
+        }
 
-            Point controlPoint1 = new Point(startPoint.X + 50, startPoint.Y);
-            Point controlPoint2 = new Point(endPoint.X - 50, endPoint.Y);
+        private void RegisterPositionChanged(Ellipse ellipse)
+        {
+            DependencyPropertyDescriptor.FromProperty(Canvas.LeftProperty, typeof(Border))
+                .AddValueChanged((Border)((Grid)((Grid)ellipse.Parent).Parent).Parent, OnPositionChanged);
+            DependencyPropertyDescriptor.FromProperty(Canvas.TopProperty, typeof(Border))
+                .AddValueChanged((Border)((Grid)((Grid)ellipse.Parent).Parent).Parent, OnPositionChanged);
+        }
+
+        public void OnPositionChanged(object? sender, EventArgs e)
+        {
+            canvas.Children.Remove(face);
+            face = GetLine();
+            canvas.Children.Add(face);
+        }
+
+        private Path GetLine()
+        {
+            Point startPoint = outputPoint.TranslatePoint(new Point(outputPoint.Width / 2, outputPoint.Height / 2), canvas);
+            Point endPoint = inputPoint.TranslatePoint(new Point(inputPoint.Width / 2, inputPoint.Height / 2), canvas);
+            Vector difference = endPoint - startPoint;
+
+            double offsetX = 20 + Math.Clamp(Math.Abs(difference.Y) / 5, 0, 100) + Math.Clamp(-difference.X / 3, 0, 100);
+            double offsetY = Math.Clamp(-difference.X/2, 0, 300) * -Math.Sign(difference.Y);
+
+            Point controlPoint1 = new Point(startPoint.X + offsetX, startPoint.Y - offsetY);
+            Point controlPoint2 = new Point(endPoint.X - offsetX, endPoint.Y + offsetY * -Math.Sign(difference.X));
 
             PathGeometry geometry = new PathGeometry();
             PathFigure figure = new PathFigure { StartPoint = startPoint };
@@ -35,14 +66,12 @@ namespace L_system.View
             figure.Segments.Add(bezierSegment);
             geometry.Figures.Add(figure);
 
-            Path face = new Path
+            return new Path
             {
                 Stroke = Brushes.White,
                 StrokeThickness = 4,
                 Data = geometry
             };
-
-            canvas.Children.Add(face);
         }
     }
 

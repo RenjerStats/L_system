@@ -278,12 +278,16 @@ namespace L_system.View
                 face.Child = CreateMiniForm();
                 face.Width = 150;
                 face.Height = 50;
+                ((Canvas)face.Parent).UpdateLayout(); //Обновляем позиции Ellipse на Canvas
+                face.SetValue(Canvas.TopProperty, (double)face.GetValue(Canvas.TopProperty) - 0.01);
             }
             else
             {
                 face.Child = CreateNormalForm();
                 face.Width = 200;
                 face.Height = 150;
+                ((Canvas)face.Parent).UpdateLayout(); //Обновляем позиции Ellipse на Canvas
+                face.SetValue(Canvas.TopProperty, (double)face.GetValue(Canvas.TopProperty) - 0.01);
             }
         }
 

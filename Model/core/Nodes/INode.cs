@@ -17,7 +17,7 @@ namespace L_system.Model.core.Nodes
 
     public class Node : INode
     {
-        protected object[] defaultInputs;
+        public object[] defaultInputs;
         public InputOfNode[] Inputs { get; set; }
         public OutputOfNode[] Outputs { get; set; }
         public string[] NameOfInputs { get; set; }

@@ -10,7 +10,8 @@ namespace L_system.Model.core.Nodes
     {
         public NodeEnd()
         {
-            Inputs = [new InputOfNode(new Command[] {new(CommandType.nothingDoing1)})];
+            defaultInputs = [new Command[] { new(CommandType.nothingDoing1) }];
+            Inputs = new InputOfNode[1];
         }
 
         public Command[] GetResult()
