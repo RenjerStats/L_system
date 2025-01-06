@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,7 +12,9 @@ namespace L_system.Model.core.Nodes
         public NodeEnd()
         {
             defaultInputs = [new Command[] { new(CommandType.nothingDoing1) }];
-            Inputs = new InputOfNode[1];
+            Inputs = new ObservableCollection<InputOfNode>(new InputOfNode[1]);
+
+            SetEventConnection();
         }
 
         public Command[] GetResult()

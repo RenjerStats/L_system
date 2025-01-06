@@ -2,7 +2,7 @@
 
 namespace L_system.ViewModel
 {
-    public class MainWindowVM : BaseVM
+    public class MainWindowVM
     {
         #region Private
         private Window window;

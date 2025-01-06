@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,12 +11,14 @@ namespace L_system.Model.core.Nodes
     {
         public NodePlus()
         {
-            Inputs = new InputOfNode[2];
             defaultInputs = [1.0D, 2.0D];
+            Inputs = new ObservableCollection<InputOfNode>(new InputOfNode[2]);
             Outputs = [new OutputOfNode(GetOutput)]; // самозацикливание
             NameOfNode = "Сложение";
             NameOfInputs = ["Слагаемое", "Слагаемое"];
             NameOfOutputs = ["Сумма"];
+
+            SetEventConnection();
         }
         private object GetOutput()
         {
@@ -28,11 +31,14 @@ namespace L_system.Model.core.Nodes
     {
         public NodeSub()
         {
+            Inputs = new ObservableCollection<InputOfNode>(new InputOfNode[2]);
             defaultInputs = [1.0D, 2.0D];
             Outputs = [new OutputOfNode(GetOutput)];
             NameOfNode = "Вычитание";
             NameOfInputs = ["Уменьшаемое", "Вычитаемое"];
             NameOfOutputs = ["Разность"];
+
+            SetEventConnection();
         }
         private object GetOutput()
         {
@@ -45,11 +51,14 @@ namespace L_system.Model.core.Nodes
     {
         public NodeMult()
         {
+            Inputs = new ObservableCollection<InputOfNode>(new InputOfNode[2]);
             defaultInputs = [1.0D, 2.0D];
             Outputs = [new OutputOfNode(GetOutput)];
             NameOfNode = "Умножение";
             NameOfInputs = ["Множитель", "Множитель"];
             NameOfOutputs = ["Произведение"];
+
+            SetEventConnection();
         }
         private object GetOutput()
         {
@@ -62,11 +71,14 @@ namespace L_system.Model.core.Nodes
     {
         public NodeDiv()
         {
+            Inputs = new ObservableCollection<InputOfNode>(new InputOfNode[2]);
             defaultInputs = [1.0D, 2.0D];
             Outputs = [new OutputOfNode(GetOutput)];
             NameOfNode = "Деление";
             NameOfInputs = ["Делимое", "Делитель"];
             NameOfOutputs = ["Частное"];
+
+            SetEventConnection();
         }
         private object GetOutput()
         {

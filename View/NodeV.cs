@@ -2,6 +2,7 @@
 using L_system.ViewModel;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;
@@ -154,11 +155,36 @@ namespace L_system.View
             Grid.SetColumn(outputNames, 2);
             form.Children.Add(outputNames);
 
-            TextBox preview = CreateSimpleText("Здесь будет превью");
+            UIElement preview = GetPreview();
             Grid.SetRow(preview, 2);
             Grid.SetColumnSpan(preview, 4);
             form.Children.Add(preview);
             return form;
+        }
+
+        private UIElement GetPreview()
+        {
+            switch (nodeCore.GetTypeOfOutput(0))
+            {
+                case "Double":
+                case "Int32":
+                    object output = nodeCore.GetValueFromOutput(0);
+                    double value = Math.Round(Convert.ToDouble(output), 5);
+                    TextBox preview = CreateSimpleText($"Выходное значение:\n\n{value.ToString("G10")}");
+                    nodeCore.OnOutputChanged(() =>
+                    {
+                        // Используем Dispatcher для изменения текста в UI-потоке
+                        preview.Dispatcher.BeginInvoke(() =>
+                        {
+                            preview.Text = $"Выходное значение:\n\n{Math.Round((double)nodeCore.GetValueFromOutput(0), 5).ToString("G10")}";
+                        });
+                    });
+                    preview.VerticalAlignment = VerticalAlignment.Center;
+                    preview.FontSize = 14;
+                    return preview;
+                default:
+                    return CreateSimpleText("");
+            }
         }
 
         private Grid CreateMiniForm()

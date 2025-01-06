@@ -1,6 +1,7 @@
 ﻿using L_system.Model.core.Nodes;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
 using System.Numerics;
@@ -17,7 +18,7 @@ namespace L_system.ViewModel
         public NodeVM(Node nodeCore)
         {
             this.nodeCore = nodeCore;
-            connectionVMToInputs = new ConnectionVM[nodeCore.Inputs.Length];
+            connectionVMToInputs = new ConnectionVM[nodeCore.Inputs.Count];
         }
 
         public bool CanCreateConnection(int inputIndex, NodeVM prefNode, int outputIndex)
@@ -34,11 +35,6 @@ namespace L_system.ViewModel
         public void Disconnect(int inputIndex)
         {
             nodeCore.ResetInputToDefault(inputIndex);
-        }
-
-        public ConnectionVM FindConnectionToInput(int inputIndex)
-        {
-            return connectionVMToInputs[inputIndex];
         }
 
         public int GetInputsCount()
@@ -63,21 +59,25 @@ namespace L_system.ViewModel
             return nodeCore.NameOfNode;
         }
 
-        //private string GetNameOfType(object value)
-        //{
-        //    switch (value.GetType().Name)
-        //    {
-        //        case "Double":
-        //            return "число";
-        //        case "String":
-        //            return "строка";
-        //        case "Command[]":
-        //            return "команды";
-        //        case "Command":
-        //            return "команда";
-        //        default:
-        //            return "неизвестный тип";
-        //    }
-        //}
+        public object GetValueFromOutput(int outputIndex)
+        {
+            return nodeCore.Outputs[outputIndex].GetValue();
+        }
+
+        public string GetTypeOfOutput(int outputIndex)
+        {
+            return nodeCore.Outputs[outputIndex].GetValue().GetType().Name;
+        }
+
+        public void OnOutputChanged(Action action)
+        {
+            this.action = action;
+            nodeCore.PropertyChanged += NodeCore_PropertyChanged;
+        }
+        private Action action;
+        private void NodeCore_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            action();
+        }
     }
 }

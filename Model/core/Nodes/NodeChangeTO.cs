@@ -1,4 +1,6 @@
-﻿namespace L_system.Model.core.Nodes
+﻿using System.Collections.ObjectModel;
+
+namespace L_system.Model.core.Nodes
 {
     public class NodeChangeTO : Node
     {
@@ -7,12 +9,14 @@
             object axiom = new Command[] { new Command(CommandType.nothingDoing1) };
             object change = new Command(CommandType.nothingDoing1);
             object to = new Command[] { new Command(CommandType.nothingDoing1) };
-            Inputs = new InputOfNode[3];
+            Inputs = new ObservableCollection<InputOfNode>(new InputOfNode[3]);
             defaultInputs = [axiom, change, to];
             Outputs = [new OutputOfNode(GetResult)];
             NameOfNode = "Замена";
             NameOfInputs = ["Команды", "Заменяемое", "Заменитель"];
             NameOfOutputs = ["Результат"];
+
+            SetEventConnection();
         }
 
         public Command[] GetResult()
