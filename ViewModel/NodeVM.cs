@@ -32,9 +32,10 @@ namespace L_system.ViewModel
             connectionVMToInputs[inputIndex] = connection;
         }
 
-        public void Disconnect(int inputIndex)
+        public void Disconnect(int inputIndex, int outputIndex)
         {
-            nodeCore.ResetInputToDefault(inputIndex);
+            nodeCore.ResetInputToDefault(inputIndex, outputIndex);
+
         }
 
         public int GetInputsCount()

@@ -1,17 +1,16 @@
 ﻿using L_system.ViewModel;
-using System;
+
 using System.Windows.Controls;
 using System.Windows;
-using System.Windows.Data;
 using System.Windows.Shapes;
-using System.Globalization;
-using L_system.Model.core.Nodes;
 using System.Windows.Media;
 using System.ComponentModel;
+using System.Windows.Input;
+using System.Xml.Linq;
 
 namespace L_system.View
 {
-    public class ConnectionV
+    public class ConnectionV : IDisposable
     {
         public ConnectionVM connectionCore;
         private Ellipse outputPoint;
@@ -32,13 +31,42 @@ namespace L_system.View
             RegisterPositionChanged(outputPoint);
             RegisterPositionChanged(inputPoint);
         }
+        public void Dispose()
+        {
+            connectionCore.Dispose();
+
+            DeleteRegisterPositionChanged(outputPoint);
+            DeleteRegisterPositionChanged(inputPoint);
+
+            canvas.Children.Remove(face);
+            ConnectionSystem.connections.Remove(this);
+        }
+
+        #region ActionsAndEvents
+
+        private void MouseCut(object sender, MouseEventArgs e)
+        {
+            if (e.RightButton == MouseButtonState.Pressed)
+            {
+                Dispose();
+            }
+        }
 
         private void RegisterPositionChanged(Ellipse ellipse)
         {
+            Border faceNode = (Border)((Grid)((Grid)ellipse.Parent).Parent).Parent;
             DependencyPropertyDescriptor.FromProperty(Canvas.LeftProperty, typeof(Border))
-                .AddValueChanged((Border)((Grid)((Grid)ellipse.Parent).Parent).Parent, OnPositionChanged);
+                .AddValueChanged(faceNode, OnPositionChanged);
             DependencyPropertyDescriptor.FromProperty(Canvas.TopProperty, typeof(Border))
-                .AddValueChanged((Border)((Grid)((Grid)ellipse.Parent).Parent).Parent, OnPositionChanged);
+                .AddValueChanged(faceNode, OnPositionChanged);
+        }
+        private void DeleteRegisterPositionChanged(Ellipse ellipse)
+        {
+            Border faceNode = (Border)((Grid)((Grid)ellipse.Parent).Parent).Parent;
+            DependencyPropertyDescriptor.FromProperty(Canvas.LeftProperty, typeof(Border))
+                .RemoveValueChanged(faceNode, OnPositionChanged);
+            DependencyPropertyDescriptor.FromProperty(Canvas.TopProperty, typeof(Border))
+                .RemoveValueChanged(faceNode, OnPositionChanged);
         }
 
         public void OnPositionChanged(object? sender, EventArgs e)
@@ -47,6 +75,8 @@ namespace L_system.View
             face = GetLine();
             canvas.Children.Add(face);
         }
+
+        #endregion
 
         private Path GetLine()
         {
@@ -66,12 +96,15 @@ namespace L_system.View
             figure.Segments.Add(bezierSegment);
             geometry.Figures.Add(figure);
 
-            return new Path
+            Path path = new Path
             {
                 Stroke = Brushes.White,
                 StrokeThickness = 4,
                 Data = geometry
             };
+            path.MouseMove += MouseCut;
+
+            return path;
         }
     }
 
@@ -87,7 +120,7 @@ namespace L_system.View
         private static int OutputIndex;
         private static int InputIndex;
 
-        private static List<ConnectionV> connections = new List<ConnectionV>();
+        public static List<ConnectionV> connections = new List<ConnectionV>();
 
 
         public static void SetInput(NodeV inputNode, int inputIndex, Ellipse inputPoint)

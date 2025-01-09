@@ -20,7 +20,8 @@ namespace L_system.Model.core.Nodes
 
     public class Node : INode, INotifyPropertyChanged
     {
-        public List<Node> nextNodes = new List<Node>();
+        public Node[] nextNodes;
+        private Node[] prefNodes;
 
         public ObservableCollection<object> defaultInputs;
         public ObservableCollection<InputOfNode> Inputs { get; set; }
@@ -29,17 +30,12 @@ namespace L_system.Model.core.Nodes
         public string[] NameOfOutputs { get; set; }
         public string NameOfNode { get; set; }
 
-        public void SetEventConnection()
+        public void FinalNodeConstructor()
         {
             defaultInputs.CollectionChanged += Inputs_CollectionChanged;
             Inputs.CollectionChanged += Inputs_CollectionChanged;
-        }
-        public void SetEventConnection(Action actionOnInputChanged)
-        {
-            defaultInputs.CollectionChanged += Inputs_CollectionChanged;
-            Inputs.CollectionChanged += Inputs_CollectionChanged;
-            defaultInputs.CollectionChanged += (object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) => actionOnInputChanged();
-            Inputs.CollectionChanged += (object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) => actionOnInputChanged();
+            nextNodes = new Node[Outputs.Length];
+            prefNodes = new Node[Inputs.Count];
         }
 
         public bool CanConnect(int inputIndex, Node prefNode, int outputIndex)
@@ -57,7 +53,8 @@ namespace L_system.Model.core.Nodes
         {
             if (!CanConnect(inputIndex, prefNode, outputIndex)) throw new ArgumentException("Разные типы входов и выходов.");
             
-            prefNode.nextNodes.Add(this);
+            prefNode.nextNodes[outputIndex] = this;
+            prefNodes[inputIndex] = prefNode;
 
             Inputs[inputIndex] = new InputOfNode(prefNode.Outputs[outputIndex]);
         }
@@ -67,20 +64,25 @@ namespace L_system.Model.core.Nodes
             OnPropertyChanged("Outputs");
         }
 
-        internal void ResetInputToDefault(int inputIndex)
+        public void ResetInputToDefault(int inputIndex, int outputIndex)
         {
             Inputs[inputIndex] = null;
+            prefNodes[inputIndex].nextNodes[outputIndex] = null;
         }
+
 
 
         public event PropertyChangedEventHandler? PropertyChanged;
         public void OnPropertyChanged([CallerMemberName] string prop = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));
+
+            if (PropertyChanged == null) return;
             foreach (var node in nextNodes)
             {
-                node.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(prop));
+                node?.OnPropertyChanged("Outputs");
             }
         }
+
     }
 }

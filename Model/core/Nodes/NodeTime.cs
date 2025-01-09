@@ -15,7 +15,7 @@ namespace L_system.Model.core.Nodes
         private Timer timer;
         public NodeTime()
         {
-            defaultInputs = [oldPeriod];
+            defaultInputs = [(double)oldPeriod];
 
             Inputs = new ObservableCollection<InputOfNode>(new InputOfNode[1]);
             Outputs = [new OutputOfNode(() => (double)counter)];
@@ -23,7 +23,7 @@ namespace L_system.Model.core.Nodes
             NameOfOutputs = ["Миллисекунды"];
             NameOfNode = "Таймер";
 
-            SetEventConnection();
+            FinalNodeConstructor();
 
             timer = new Timer(UpdateOutput, null, 0, 1);
         }
@@ -31,7 +31,7 @@ namespace L_system.Model.core.Nodes
 
         private void UpdateOutput(object? state)
         {
-            int period = Inputs[0] == null ? (int)defaultInputs[0] : (int)Inputs[0].GetValue();
+            int period = Inputs[0] == null ? Convert.ToInt32(defaultInputs[0]) : Convert.ToInt32(Inputs[0].GetValue());
             if (period != oldPeriod)
             {
                 timer.Change(0, period);
@@ -43,8 +43,7 @@ namespace L_system.Model.core.Nodes
 
         ~NodeTime()
         {
-            // Освобождаем ресурсы таймера
-            timer?.Dispose();
+            timer.Dispose();
         }
     }
 }

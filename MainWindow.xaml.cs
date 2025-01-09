@@ -19,18 +19,18 @@ namespace L_system
         {
             InitializeComponent();
 
+            NodeV nodeSin = new NodeV(new(300, 50), new NodeVM(new NodeSin()));
             NodeV nodeDiv = new NodeV(new(300, 50), new NodeVM(new NodeDiv()));
+            NodeV nodeDi1 = new NodeV(new(300, 50), new NodeVM(new NodeDiv()));
             NodeV nodeTimer = new NodeV(new(100, 50), new NodeVM(new NodeTime()));
             NodeV nodeTimer1 = new NodeV(new(100, 50), new NodeVM(new NodeTime()));
-            NodeV nodeTimer2 = new NodeV(new(100, 50), new NodeVM(new NodeTime()));
-            NodeV nodeConst1 = new NodeV(new(100, 200), new NodeVM(new NodeConstant(10)));
-            NodeV nodeConst2 = new NodeV(new(100, 200), new NodeVM(new NodeConstant(100)));
+            NodeV nodeConst = new NodeV(new(100, 200), new NodeVM(new NodeConstant(100D)));
 
+            NodeCanvas.Children.Add(nodeSin.face);
             NodeCanvas.Children.Add(nodeDiv.face);
+            NodeCanvas.Children.Add(nodeDi1.face);
             NodeCanvas.Children.Add(nodeTimer1.face);
-            NodeCanvas.Children.Add(nodeTimer2.face);
-            NodeCanvas.Children.Add(nodeConst1.face);
-            NodeCanvas.Children.Add(nodeConst2.face);
+            NodeCanvas.Children.Add(nodeConst.face);
         }
     }
 }

@@ -16,7 +16,7 @@ namespace L_system.Model.core.Nodes
             NameOfInputs = ["Команды", "Заменяемое", "Заменитель"];
             NameOfOutputs = ["Результат"];
 
-            SetEventConnection();
+            FinalNodeConstructor();
         }
 
         public Command[] GetResult()

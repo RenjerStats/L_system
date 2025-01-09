@@ -14,7 +14,7 @@ namespace L_system.Model.core.Nodes
             defaultInputs = [new Command[] { new(CommandType.nothingDoing1) }];
             Inputs = new ObservableCollection<InputOfNode>(new InputOfNode[1]);
 
-            SetEventConnection();
+            FinalNodeConstructor();
         }
 
         public Command[] GetResult()

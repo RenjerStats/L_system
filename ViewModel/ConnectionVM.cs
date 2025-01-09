@@ -6,6 +6,34 @@ using System.Threading.Tasks;
 
 namespace L_system.ViewModel
 {
+    public class ConnectionVM : IDisposable
+    {
+        private NodeVM outputNode;
+        private NodeVM inputNode;
+
+        private int outputIndex;
+        private int inputIndex;
+
+        public static bool CanCreateConnection(NodeVM outputNode, int outputIndex, NodeVM inputNode, int inputIndex)
+        {
+            return inputNode.CanCreateConnection(inputIndex, outputNode, outputIndex);
+        }
+
+        public ConnectionVM(NodeVM outputNode, int outputIndex, NodeVM inputNode, int inputIndex)
+        {
+            this.outputNode = outputNode;
+            this.inputNode = inputNode;
+            this.inputIndex = inputIndex;
+            this.outputIndex = outputIndex;
+
+            inputNode.CreateConnection(inputIndex, outputNode, outputIndex, this);
+        }
+        public void Dispose()
+        {
+            inputNode.Disconnect(inputIndex, outputIndex);
+        }
+    }
+
     public static class ConnectionSystem
     {
         private static NodeVM? OutputNode;
@@ -43,35 +71,6 @@ namespace L_system.ViewModel
 
                 }
             }
-        }
-    }
-
-    public class ConnectionVM
-    {
-        private NodeVM outputNode;
-        private NodeVM inputNode;
-
-        private int outputIndex;
-        private int inputIndex;
-
-        public static bool CanCreateConnection(NodeVM outputNode, int outputIndex, NodeVM inputNode, int inputIndex)
-        {
-            return inputNode.CanCreateConnection(inputIndex, outputNode, outputIndex);
-        }
-
-        public ConnectionVM(NodeVM outputNode, int outputIndex, NodeVM inputNode, int inputIndex)
-        {
-            this.outputNode = outputNode;
-            this.inputNode = inputNode;
-            this.inputIndex = inputIndex;
-            this.outputIndex = outputIndex;
-
-            inputNode.CreateConnection(inputIndex, outputNode, outputIndex, this);
-        }
-
-        ~ConnectionVM()
-        {
-            inputNode.Disconnect(inputIndex);
         }
     }
 }

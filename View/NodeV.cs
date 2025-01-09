@@ -167,7 +167,6 @@ namespace L_system.View
             switch (nodeCore.GetTypeOfOutput(0))
             {
                 case "Double":
-                case "Int32":
                     object output = nodeCore.GetValueFromOutput(0);
                     double value = Math.Round(Convert.ToDouble(output), 5);
                     TextBox preview = CreateSimpleText($"Выходное значение:\n\n{value.ToString("G10")}");
@@ -176,7 +175,7 @@ namespace L_system.View
                         // Используем Dispatcher для изменения текста в UI-потоке
                         preview.Dispatcher.BeginInvoke(() =>
                         {
-                            preview.Text = $"Выходное значение:\n\n{Math.Round((double)nodeCore.GetValueFromOutput(0), 5).ToString("G10")}";
+                            preview.Text = $"Выходное значение:\n\n{Math.Round((double)nodeCore.GetValueFromOutput(0), 5):G10}";
                         });
                     });
                     preview.VerticalAlignment = VerticalAlignment.Center;

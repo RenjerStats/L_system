@@ -18,7 +18,7 @@ namespace L_system.Model.core.Nodes
             NameOfInputs = ["Слагаемое", "Слагаемое"];
             NameOfOutputs = ["Сумма"];
 
-            SetEventConnection();
+            FinalNodeConstructor();
         }
         private object GetOutput()
         {
@@ -38,7 +38,7 @@ namespace L_system.Model.core.Nodes
             NameOfInputs = ["Уменьшаемое", "Вычитаемое"];
             NameOfOutputs = ["Разность"];
 
-            SetEventConnection();
+            FinalNodeConstructor();
         }
         private object GetOutput()
         {
@@ -58,7 +58,7 @@ namespace L_system.Model.core.Nodes
             NameOfInputs = ["Множитель", "Множитель"];
             NameOfOutputs = ["Произведение"];
 
-            SetEventConnection();
+            FinalNodeConstructor();
         }
         private object GetOutput()
         {
@@ -78,7 +78,7 @@ namespace L_system.Model.core.Nodes
             NameOfInputs = ["Делимое", "Делитель"];
             NameOfOutputs = ["Частное"];
 
-            SetEventConnection();
+            FinalNodeConstructor();
         }
         private object GetOutput()
         {
@@ -87,6 +87,26 @@ namespace L_system.Model.core.Nodes
             return firstValue / secondValue;
         }
     }
+    internal class NodeSin : Node
+    {
+        public NodeSin()
+        {
+            Inputs = new ObservableCollection<InputOfNode>(new InputOfNode[1]);
+            defaultInputs = [Math.PI/4];
+            Outputs = [new OutputOfNode(GetOutput)];
+            NameOfNode = "Sin";
+            NameOfInputs = ["Число"];
+            NameOfOutputs = ["[-1;1]"];
+
+            FinalNodeConstructor();
+        }
+        private object GetOutput()
+        {
+            double firstValue = Inputs[0] == null ? (double)defaultInputs[0] : (double)Inputs[0].GetValue();
+            return Math.Sin(firstValue);
+        }
+    }
+
 
 
 }

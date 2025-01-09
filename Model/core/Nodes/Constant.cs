@@ -12,7 +12,7 @@ namespace L_system.Model.core.Nodes
             NameOfOutputs = ["Значение"];
             NameOfNode = "Константа";
 
-            SetEventConnection();
+            FinalNodeConstructor();
         }
     }
 }
