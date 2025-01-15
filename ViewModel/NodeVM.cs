@@ -19,6 +19,7 @@ namespace L_system.ViewModel
         {
             this.nodeCore = nodeCore;
             connectionVMToInputs = new ConnectionVM[nodeCore.Inputs.Count];
+            nodeCore.PropertyChanged += NodeCore_PropertyChanged;
         }
 
         public bool CanCreateConnection(int inputIndex, NodeVM prefNode, int outputIndex)
@@ -65,20 +66,43 @@ namespace L_system.ViewModel
             return nodeCore.Outputs[outputIndex].GetValue();
         }
 
+        public object GetValueFromDefInput(int inputIndex)
+        {
+            return nodeCore.defaultInputs[inputIndex];
+        }
+
+        public void SetValueToDefInput(object value, int inputIndex)
+        {
+            nodeCore.defaultInputs[inputIndex] = value;
+        }
+
+        public bool IsInputFree(int inputIndex)
+        {
+            return nodeCore.Inputs[inputIndex] == null;
+        }
+
         public string GetTypeOfOutput(int outputIndex)
         {
+            if (nodeCore.Outputs.Length == 0) return "End";
             return nodeCore.Outputs[outputIndex].GetValue().GetType().Name;
+        }
+        public string GetTypeOfInput(int inputIndex)
+        {
+            if (nodeCore.Inputs.Count == 0) return "Empty";
+            return nodeCore.defaultInputs[inputIndex].GetType().Name;
         }
 
         public void OnOutputChanged(Action action)
         {
-            this.action = action;
-            nodeCore.PropertyChanged += NodeCore_PropertyChanged;
+            actions.Add(action);
         }
-        private Action action;
+        private List<Action> actions = new List<Action>();
         private void NodeCore_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
-            action();
+            foreach (var action in actions)
+            {
+                action();
+            }
         }
     }
 }

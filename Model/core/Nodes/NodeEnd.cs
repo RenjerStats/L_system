@@ -13,6 +13,9 @@ namespace L_system.Model.core.Nodes
         {
             defaultInputs = [new Command[] { new(CommandType.nothingDoing1) }];
             Inputs = new ObservableCollection<InputOfNode>(new InputOfNode[1]);
+            Outputs = Array.Empty<OutputOfNode>();
+            NameOfNode = "Отрисовка";
+            NameOfInputs = ["На отрисовку"];
 
             FinalNodeConstructor();
         }

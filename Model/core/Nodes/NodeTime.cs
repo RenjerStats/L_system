@@ -20,7 +20,7 @@ namespace L_system.Model.core.Nodes
             Inputs = new ObservableCollection<InputOfNode>(new InputOfNode[1]);
             Outputs = [new OutputOfNode(() => (double)counter)];
             NameOfInputs = ["Период"];
-            NameOfOutputs = ["Миллисекунды"];
+            NameOfOutputs = ["Миллисек"];
             NameOfNode = "Таймер";
 
             FinalNodeConstructor();

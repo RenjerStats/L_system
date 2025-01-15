@@ -13,6 +13,7 @@ namespace L_system.Model.core.Nodes
     {
         public ObservableCollection<InputOfNode> Inputs { get; set; }
         public OutputOfNode[] Outputs { get; set; }
+        public object[] Parameters { get; set; }
         public string[] NameOfInputs { get; set; }
         public string[] NameOfOutputs { get; set; }
         public string NameOfNode {  get; set; }
@@ -22,6 +23,8 @@ namespace L_system.Model.core.Nodes
     {
         public Node[] nextNodes;
         private Node[] prefNodes;
+
+        public object[] Parameters { get; set; }
 
         public ObservableCollection<object> defaultInputs;
         public ObservableCollection<InputOfNode> Inputs { get; set; }

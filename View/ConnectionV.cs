@@ -85,10 +85,10 @@ namespace L_system.View
             Vector difference = endPoint - startPoint;
 
             double offsetX = 20 + Math.Clamp(Math.Abs(difference.Y) / 5, 0, 100) + Math.Clamp(-difference.X / 3, 0, 100);
-            double offsetY = Math.Clamp(-difference.X/2, 0, 300) * -Math.Sign(difference.Y);
+            double offsetY = Math.Clamp(-difference.X/2, 0, 300) * Math.Sign(difference.Y) * Math.Sign(difference.X);
 
             Point controlPoint1 = new Point(startPoint.X + offsetX, startPoint.Y - offsetY);
-            Point controlPoint2 = new Point(endPoint.X - offsetX, endPoint.Y + offsetY * -Math.Sign(difference.X));
+            Point controlPoint2 = new Point(endPoint.X - offsetX, endPoint.Y + offsetY);
 
             PathGeometry geometry = new PathGeometry();
             PathFigure figure = new PathFigure { StartPoint = startPoint };

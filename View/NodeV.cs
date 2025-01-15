@@ -14,16 +14,21 @@ namespace L_system.View
     {
         public NodeVM nodeCore;
         public Border face;
+        public Canvas canvas;
         public Ellipse[] inputsPoint;
         public Ellipse[] outputsPoint;
+        public DefaultInputV[] defaultInputs;
 
         public bool MiniSize { get; private set; } = false;
 
-        public NodeV(Point position, NodeVM core)
+        public NodeV(Point position, NodeVM core, Canvas canvas)
         {
             nodeCore = core;
+            this.canvas = canvas;
 
             inputsPoint = new Ellipse[core.GetInputsCount()];
+            defaultInputs = new DefaultInputV[core.GetInputsCount()];
+
             for (int i = 0; i < core.GetInputsCount(); i++)
                 inputsPoint[i] = CreatePoint(i, true);
             outputsPoint = new Ellipse[core.GetOutputsCount()];
@@ -33,7 +38,7 @@ namespace L_system.View
 
             face = new Border()
             {
-                Width = 200,
+                Width = 150,
                 Height = 150,
                 Background = (Brush)new BrushConverter().ConvertFrom("#FF333333"),
                 CornerRadius = new CornerRadius(10),
@@ -45,9 +50,15 @@ namespace L_system.View
             face.PreviewMouseLeftButtonDown += Node_MouseLeftButtonDown; // Превью обрабатывается раньше, чем дочерние события. Сначала parent, потом children
             face.PreviewMouseMove += Node_MouseMove;
             face.MouseLeave += Node_MouseLeave;
+            canvas.MouseLeftButtonUp += ResetActiveMode;
+            canvas.MouseLeave += ResetActiveMode;
 
             Canvas.SetLeft(face, position.X);
             Canvas.SetTop(face, position.Y);
+            canvas.Children.Add(face);
+
+            for (int i = 0; i < core.GetInputsCount(); i++)
+                defaultInputs[i] = new DefaultInputV(core, i, inputsPoint[i], canvas); // Зависит от canvas.Children.Add(face);
         }
 
         #region Visual
@@ -169,13 +180,13 @@ namespace L_system.View
                 case "Double":
                     object output = nodeCore.GetValueFromOutput(0);
                     double value = Math.Round(Convert.ToDouble(output), 5);
-                    TextBox preview = CreateSimpleText($"Выходное значение:\n\n{value.ToString("G10")}");
+                    TextBox preview = CreateSimpleText($"Выходное значение:\n\n{value:G10}");
                     nodeCore.OnOutputChanged(() =>
                     {
                         // Используем Dispatcher для изменения текста в UI-потоке
                         preview.Dispatcher.BeginInvoke(() =>
                         {
-                            preview.Text = $"Выходное значение:\n\n{Math.Round((double)nodeCore.GetValueFromOutput(0), 5):G10}";
+                            preview.Text = $"Выходное значение:\n\n{nodeCore.GetValueFromOutput(0):F5}";
                         });
                     });
                     preview.VerticalAlignment = VerticalAlignment.Center;
@@ -272,16 +283,15 @@ namespace L_system.View
             point.Height = 10;
             point.Tag = isInput ? row.ToString() : '-' + row.ToString();
             point.HorizontalAlignment = isInput ? HorizontalAlignment.Left : HorizontalAlignment.Right;
-            point.MouseLeftButtonDown += StartConnection;
-            point.MouseLeftButtonUp += EndConnection;
+            point.MouseLeftButtonDown += StartConnection; point.MouseLeftButtonDown += StartValueChangeTimer;
+            point.MouseLeftButtonUp += EndConnection;     point.MouseLeftButtonUp += ResetStartValueChangeTimer;
+            point.MouseLeave += ResetStartValueChangeTimer;
             Grid.SetRow(point, row);
             Grid.SetColumn(point, 0);
             return point;
         }
 
-
         #endregion
-
 
         private void OnCollapse(object sender, RoutedEventArgs e)
         {
@@ -303,16 +313,19 @@ namespace L_system.View
                 face.Child = CreateMiniForm();
                 face.Width = 150;
                 face.Height = 50;
-                ((Canvas)face.Parent).UpdateLayout(); //Обновляем позиции Ellipse на Canvas
-                face.SetValue(Canvas.TopProperty, (double)face.GetValue(Canvas.TopProperty) - 0.01);
             }
             else
             {
                 face.Child = CreateNormalForm();
-                face.Width = 200;
+                face.Width = 150;
                 face.Height = 150;
-                ((Canvas)face.Parent).UpdateLayout(); //Обновляем позиции Ellipse на Canvas
-                face.SetValue(Canvas.TopProperty, (double)face.GetValue(Canvas.TopProperty) - 0.01);
+            }
+
+            canvas.UpdateLayout(); //Обновляем позиции Ellipse на Canvas
+            face.SetValue(Canvas.TopProperty, (double)face.GetValue(Canvas.TopProperty) - 0.01);
+            foreach (var defaultInput in defaultInputs)
+            {
+                defaultInput.ResetPosition();
             }
         }
 
@@ -326,11 +339,13 @@ namespace L_system.View
 
             if (rowID[0] == '-')
             {
-                ConnectionSystem.SetOutput(this, int.Parse(rowID[1..]), point);
+                int outputIndex = int.Parse(rowID[1..]);
+                ConnectionSystem.SetOutput(this, outputIndex, point);
             }
             else
             {
-                ConnectionSystem.SetInput(this, int.Parse(rowID), point);
+                int inputIndex = int.Parse(rowID);
+                ConnectionSystem.SetInput(this, inputIndex, point);
             }
         }
 
@@ -354,30 +369,37 @@ namespace L_system.View
         #region Drag
         double firstXPos, firstYPos;
         Border? movingFace;
+
         private void Node_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             movingFace = sender as Border;
-            Canvas canvas = face.Parent as Canvas;
 
-            int top = Canvas.GetZIndex(movingFace);
-            foreach (UIElement child in canvas.Children)
+            UpdateZIndex();
+            foreach (var defaultInput in defaultInputs)
             {
-                if (top < Canvas.GetZIndex(child))
-                    top = Canvas.GetZIndex(child);
+                defaultInput.face.SetValue(Canvas.ZIndexProperty, Canvas.GetZIndex(movingFace));
             }
-
-            Canvas.SetZIndex(movingFace, top + 1);
 
             firstXPos = e.GetPosition(movingFace).X;
             firstYPos = e.GetPosition(movingFace).Y;
+        }
+
+        private void UpdateZIndex()
+        {
+            int maxZIndex = Canvas.GetZIndex(movingFace);
+            foreach (UIElement child in canvas.Children)
+            {
+                if (maxZIndex < Canvas.GetZIndex(child))
+                    maxZIndex = Canvas.GetZIndex(child);
+            }
+
+            Canvas.SetZIndex(movingFace, maxZIndex + 1);
         }
 
         private void Node_MouseMove(object sender, MouseEventArgs e)
         {
             if (e.LeftButton == MouseButtonState.Pressed && movingFace == sender as Border)
             {
-                Canvas canvas = face.Parent as Canvas;
-
                 double newLeft = e.GetPosition(canvas).X - firstXPos;
                 // newLeft inside canvas right-border?
                 if (newLeft > canvas.ActualWidth - movingFace.ActualWidth)
@@ -387,7 +409,7 @@ namespace L_system.View
                     newLeft = 0;
                 movingFace.SetValue(Canvas.LeftProperty, newLeft);
 
-                double newTop = e.GetPosition(canvas).Y - firstYPos - canvas.Margin.Top;
+                double newTop = e.GetPosition(canvas).Y - firstYPos;
                 // newTop inside canvas bottom-border?
                 if (newTop > canvas.ActualHeight - movingFace.ActualHeight)
                     newTop = canvas.ActualHeight - movingFace.ActualHeight;
@@ -402,6 +424,105 @@ namespace L_system.View
         {
             movingFace = null;
         }
+
+        #endregion
+
+        #region SetDefaultValue
+        private Timer? startValueChangeTimer;
+        private Timer? valueChangeTimer;
+        private Ellipse lastSender;
+        private Point startPosition;
+        private Border valueText;
+
+        private void StartValueChangeTimer(object sender, MouseButtonEventArgs e)
+        {
+            lastSender = sender as Ellipse;
+            startPosition = e.GetPosition(canvas);
+
+            startValueChangeTimer = new Timer(StartChangeValue, null, 1000, Timeout.Infinite);
+        }
+
+        private void StartChangeValue(object? state)
+        {
+            lastSender.Dispatcher.BeginInvoke(() =>
+            {
+                string rowID = lastSender.Tag as string;
+
+                if (rowID[0] != '-')
+                {
+                    int inputIndex = int.Parse(rowID);
+                    if (nodeCore.IsInputFree(inputIndex) && nodeCore.GetTypeOfInput(inputIndex) == "Double")
+                    {
+                        valueText = CreateBaseFormForValue(inputIndex);
+
+                        Point mousePosition = Mouse.GetPosition(canvas);
+                        valueText.SetValue(Canvas.LeftProperty, startPosition.X-60);
+                        valueText.SetValue(Canvas.TopProperty, mousePosition.Y-7);
+
+                        canvas.Children.Add(valueText);
+
+                        valueChangeTimer = new Timer(ChangeValue, null, 0, 50);
+                    }
+                }
+            });
+        }
+
+        private Border CreateBaseFormForValue(int inputIndex)
+        {
+            TextBox child = CreateSimpleText($"{nodeCore.GetValueFromDefInput(inputIndex):F3}");
+
+            nodeCore.OnOutputChanged(() => {
+                lastSender.Dispatcher.BeginInvoke(() =>
+                {
+                    child.Text = $"{nodeCore.GetValueFromDefInput(inputIndex):F3}";
+                });
+            });
+
+            return new Border()
+            {
+                Width = 50,
+                Height = 15,
+                Background = (Brush)new BrushConverter().ConvertFrom("#FF333333"),
+                CornerRadius = new CornerRadius(3),
+                BorderBrush = Brushes.Black,
+                BorderThickness = new Thickness(2),
+                Child = child
+            };
+
+        }
+
+        private void ChangeValue(object? state)
+        {
+            lastSender.Dispatcher.BeginInvoke(() =>
+            {
+                string rowID = lastSender.Tag as string;
+                int inputIndex = int.Parse(rowID);
+                Vector difference = Mouse.GetPosition(canvas) - startPosition;
+                double offsetY = difference.Y/1000;
+
+                double newValue = (double)nodeCore.GetValueFromDefInput(inputIndex) - offsetY;
+                nodeCore.SetValueToDefInput(newValue, inputIndex);
+
+                Point mousePosition = Mouse.GetPosition(canvas);
+                valueText.SetValue(Canvas.TopProperty, mousePosition.Y-7);
+            });
+        }
+
+        private void ResetStartValueChangeTimer(object sender, MouseEventArgs e)
+        {
+            startValueChangeTimer?.Dispose();
+        }
+
+        private void ResetActiveMode(object sender, MouseButtonEventArgs e)
+        {
+            valueChangeTimer?.Dispose();
+        }
+
+        private void ResetActiveMode(object sender, MouseEventArgs e)
+        {
+            valueChangeTimer?.Dispose();
+        }
+
 
         #endregion
     }
