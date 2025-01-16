@@ -50,8 +50,6 @@ namespace L_system.View
             face.PreviewMouseLeftButtonDown += Node_MouseLeftButtonDown; // Превью обрабатывается раньше, чем дочерние события. Сначала parent, потом children
             face.PreviewMouseMove += Node_MouseMove;
             face.MouseLeave += Node_MouseLeave;
-            canvas.MouseLeftButtonUp += ResetActiveMode;
-            canvas.MouseLeave += ResetActiveMode;
 
             Canvas.SetLeft(face, position.X);
             Canvas.SetTop(face, position.Y);
@@ -283,9 +281,8 @@ namespace L_system.View
             point.Height = 10;
             point.Tag = isInput ? row.ToString() : '-' + row.ToString();
             point.HorizontalAlignment = isInput ? HorizontalAlignment.Left : HorizontalAlignment.Right;
-            point.MouseLeftButtonDown += StartConnection; point.MouseLeftButtonDown += StartValueChangeTimer;
-            point.MouseLeftButtonUp += EndConnection;     point.MouseLeftButtonUp += ResetStartValueChangeTimer;
-            point.MouseLeave += ResetStartValueChangeTimer;
+            point.MouseLeftButtonDown += StartConnection;
+            point.MouseLeftButtonUp += EndConnection;
             Grid.SetRow(point, row);
             Grid.SetColumn(point, 0);
             return point;
@@ -424,105 +421,6 @@ namespace L_system.View
         {
             movingFace = null;
         }
-
-        #endregion
-
-        #region SetDefaultValue
-        private Timer? startValueChangeTimer;
-        private Timer? valueChangeTimer;
-        private Ellipse lastSender;
-        private Point startPosition;
-        private Border valueText;
-
-        private void StartValueChangeTimer(object sender, MouseButtonEventArgs e)
-        {
-            lastSender = sender as Ellipse;
-            startPosition = e.GetPosition(canvas);
-
-            startValueChangeTimer = new Timer(StartChangeValue, null, 1000, Timeout.Infinite);
-        }
-
-        private void StartChangeValue(object? state)
-        {
-            lastSender.Dispatcher.BeginInvoke(() =>
-            {
-                string rowID = lastSender.Tag as string;
-
-                if (rowID[0] != '-')
-                {
-                    int inputIndex = int.Parse(rowID);
-                    if (nodeCore.IsInputFree(inputIndex) && nodeCore.GetTypeOfInput(inputIndex) == "Double")
-                    {
-                        valueText = CreateBaseFormForValue(inputIndex);
-
-                        Point mousePosition = Mouse.GetPosition(canvas);
-                        valueText.SetValue(Canvas.LeftProperty, startPosition.X-60);
-                        valueText.SetValue(Canvas.TopProperty, mousePosition.Y-7);
-
-                        canvas.Children.Add(valueText);
-
-                        valueChangeTimer = new Timer(ChangeValue, null, 0, 50);
-                    }
-                }
-            });
-        }
-
-        private Border CreateBaseFormForValue(int inputIndex)
-        {
-            TextBox child = CreateSimpleText($"{nodeCore.GetValueFromDefInput(inputIndex):F3}");
-
-            nodeCore.OnOutputChanged(() => {
-                lastSender.Dispatcher.BeginInvoke(() =>
-                {
-                    child.Text = $"{nodeCore.GetValueFromDefInput(inputIndex):F3}";
-                });
-            });
-
-            return new Border()
-            {
-                Width = 50,
-                Height = 15,
-                Background = (Brush)new BrushConverter().ConvertFrom("#FF333333"),
-                CornerRadius = new CornerRadius(3),
-                BorderBrush = Brushes.Black,
-                BorderThickness = new Thickness(2),
-                Child = child
-            };
-
-        }
-
-        private void ChangeValue(object? state)
-        {
-            lastSender.Dispatcher.BeginInvoke(() =>
-            {
-                string rowID = lastSender.Tag as string;
-                int inputIndex = int.Parse(rowID);
-                Vector difference = Mouse.GetPosition(canvas) - startPosition;
-                double offsetY = difference.Y/1000;
-
-                double newValue = (double)nodeCore.GetValueFromDefInput(inputIndex) - offsetY;
-                nodeCore.SetValueToDefInput(newValue, inputIndex);
-
-                Point mousePosition = Mouse.GetPosition(canvas);
-                valueText.SetValue(Canvas.TopProperty, mousePosition.Y-7);
-            });
-        }
-
-        private void ResetStartValueChangeTimer(object sender, MouseEventArgs e)
-        {
-            startValueChangeTimer?.Dispose();
-        }
-
-        private void ResetActiveMode(object sender, MouseButtonEventArgs e)
-        {
-            valueChangeTimer?.Dispose();
-        }
-
-        private void ResetActiveMode(object sender, MouseEventArgs e)
-        {
-            valueChangeTimer?.Dispose();
-        }
-
 
         #endregion
     }

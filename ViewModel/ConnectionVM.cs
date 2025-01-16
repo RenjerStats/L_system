@@ -8,11 +8,11 @@ namespace L_system.ViewModel
 {
     public class ConnectionVM : IDisposable
     {
-        private NodeVM outputNode;
-        private NodeVM inputNode;
+        public NodeVM outputNode { get; private set; }
+        public NodeVM inputNode { get; private set; }
 
-        private int outputIndex;
-        private int inputIndex;
+        public int outputIndex { get; private set; }
+        public int inputIndex { get; private set; }
 
         public static bool CanCreateConnection(NodeVM outputNode, int outputIndex, NodeVM inputNode, int inputIndex)
         {
@@ -26,7 +26,7 @@ namespace L_system.ViewModel
             this.inputIndex = inputIndex;
             this.outputIndex = outputIndex;
 
-            inputNode.CreateConnection(inputIndex, outputNode, outputIndex, this);
+            inputNode.CreateConnection(inputIndex, outputNode, outputIndex);
         }
         public void Dispose()
         {
@@ -68,7 +68,6 @@ namespace L_system.ViewModel
                 if (ConnectionVM.CanCreateConnection(OutputNode, OutputIndex, InputNode, InputIndex))
                 {
                     connections.Add(new ConnectionVM(OutputNode, OutputIndex, InputNode, InputIndex));
-
                 }
             }
         }

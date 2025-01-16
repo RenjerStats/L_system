@@ -22,6 +22,7 @@ namespace L_system.View
         private Canvas canvas;
 
         public Border face;
+        public bool isShow { get; private set; } = true;
 
         public DefaultInputV(NodeVM node, int inputIndex, Ellipse connectionPoint, Canvas canvas)
         {
@@ -29,6 +30,8 @@ namespace L_system.View
             this.inputIndex = inputIndex;
             this.connectionPoint = connectionPoint;
             this.canvas = canvas;
+
+            node.OnInputsChanged(ShowOrNotDefaultInput);
 
             face = CreateForm();
             face.Loaded += Face_Loaded;
@@ -44,16 +47,35 @@ namespace L_system.View
             canvas.Children.Add(face);
         }
 
-        private void Off()
+        private void ShowOrNotDefaultInput()
+        {
+            if (isShow != node.IsInputFree(inputIndex))
+            {
+                isShow = node.IsInputFree(inputIndex);
+
+                if (isShow) On();
+                else Off();
+            }
+        }
+
+        public void Off()
         {
             DeleteRegisterPositionChanged(connectionPoint);
             canvas.Children.Remove(face);
         }
 
-        private void On()
+        public void On()
         {
             RegisterPositionChanged(connectionPoint);
             canvas.Children.Add(face);
+        }
+
+
+
+        private void MoveOffScreen()
+        {
+            face.SetValue(Canvas.LeftProperty, -60D);
+            face.SetValue(Canvas.TopProperty, -10D);
         }
 
         private void Face_Loaded(object sender, RoutedEventArgs e)
@@ -131,8 +153,7 @@ namespace L_system.View
         }
         public void OnPositionChanged(object? sender, EventArgs e)
         {
-            face.SetValue(Canvas.LeftProperty, -60D); // Прячем face при перемещении
-            face.SetValue(Canvas.TopProperty, -10D);
+            MoveOffScreen();
         }
 
 

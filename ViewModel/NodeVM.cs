@@ -1,4 +1,5 @@
 ﻿using L_system.Model.core.Nodes;
+using L_system.View;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -13,30 +14,28 @@ namespace L_system.ViewModel
     public class NodeVM
     {
         private Node nodeCore;
-        private ConnectionVM[] connectionVMToInputs;
 
         public NodeVM(Node nodeCore)
         {
             this.nodeCore = nodeCore;
-            connectionVMToInputs = new ConnectionVM[nodeCore.Inputs.Count];
             nodeCore.PropertyChanged += NodeCore_PropertyChanged;
+            nodeCore.Inputs.CollectionChanged += Inputs_CollectionChanged;
         }
+
 
         public bool CanCreateConnection(int inputIndex, NodeVM prefNode, int outputIndex)
         {
             return nodeCore.CanConnect(inputIndex, prefNode.nodeCore, outputIndex);
         }
 
-        public void CreateConnection(int inputIndex, NodeVM prefNode, int outputIndex, ConnectionVM connection)
+        public void CreateConnection(int inputIndex, NodeVM prefNode, int outputIndex)
         {
             nodeCore.Connect(inputIndex, prefNode.nodeCore, outputIndex);
-            connectionVMToInputs[inputIndex] = connection;
         }
 
         public void Disconnect(int inputIndex, int outputIndex)
         {
             nodeCore.ResetInputToDefault(inputIndex, outputIndex);
-
         }
 
         public int GetInputsCount()
@@ -92,14 +91,28 @@ namespace L_system.ViewModel
             return nodeCore.defaultInputs[inputIndex].GetType().Name;
         }
 
+
         public void OnOutputChanged(Action action)
         {
-            actions.Add(action);
+            actionsOnOutputChanged.Add(action);
         }
-        private List<Action> actions = new List<Action>();
+        private List<Action> actionsOnOutputChanged = new List<Action>();
         private void NodeCore_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
-            foreach (var action in actions)
+            foreach (var action in actionsOnOutputChanged.ToList())
+            {
+                action();
+            }
+        }
+
+        public void OnInputsChanged(Action action)
+        {
+            actionsOnInputsChanged.Add(action);
+        }
+        private List<Action> actionsOnInputsChanged = new List<Action>();
+        private void Inputs_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            foreach (var action in actionsOnInputsChanged.ToList())
             {
                 action();
             }

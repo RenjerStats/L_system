@@ -1,12 +1,11 @@
-﻿using L_system.ViewModel;
-
-using System.Windows.Controls;
-using System.Windows;
-using System.Windows.Shapes;
-using System.Windows.Media;
+﻿using L_system.Model.core.Nodes;
+using L_system.ViewModel;
 using System.ComponentModel;
+using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
-using System.Xml.Linq;
+using System.Windows.Media;
+using System.Windows.Shapes;
 
 namespace L_system.View
 {
@@ -151,6 +150,11 @@ namespace L_system.View
             {
                 if (ConnectionVM.CanCreateConnection(OutputNode.nodeCore, OutputIndex, InputNode.nodeCore, InputIndex))
                 {
+                    if (!InputNode.nodeCore.IsInputFree(InputIndex))
+                    {
+                        ConnectionV connectionWithSameInput = connections.Where((a) => a.connectionCore.inputNode == InputNode.nodeCore).ToArray()[0];
+                        connectionWithSameInput.Dispose();
+                    }
                     ConnectionVM core = new ConnectionVM(OutputNode.nodeCore, OutputIndex, InputNode.nodeCore, InputIndex);
                     ConnectionV connection = new ConnectionV(core, OutputPoint, InputPoint, Canvas);
 
