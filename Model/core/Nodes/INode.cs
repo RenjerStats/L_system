@@ -61,19 +61,16 @@ namespace L_system.Model.core.Nodes
 
             Inputs[inputIndex] = new InputOfNode(prefNode.Outputs[outputIndex]);
         }
-
-        public void Inputs_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        {
-            OnPropertyChanged("Outputs");
-        }
-
         public void ResetInputToDefault(int inputIndex, int outputIndex)
         {
             Inputs[inputIndex] = null;
             prefNodes[inputIndex].nextNodes[outputIndex] = null;
         }
 
-
+        public void Inputs_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            OnPropertyChanged("Outputs");
+        }
 
         public event PropertyChangedEventHandler? PropertyChanged;
         public void OnPropertyChanged([CallerMemberName] string prop = "")
@@ -86,6 +83,5 @@ namespace L_system.Model.core.Nodes
                 node?.OnPropertyChanged("Outputs");
             }
         }
-
     }
 }

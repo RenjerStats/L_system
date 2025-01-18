@@ -14,7 +14,7 @@ using Windows.Foundation.Collections;
 
 namespace L_system.View
 {
-    public class DefaultInputV
+    public class DefaultInputV : IDisposable
     {
         private NodeVM node;
         private int inputIndex;
@@ -53,24 +53,22 @@ namespace L_system.View
             {
                 isShow = node.IsInputFree(inputIndex);
 
-                if (isShow) On();
-                else Off();
+                if (isShow) Show();
+                else Hide();
             }
         }
 
-        public void Off()
-        {
-            DeleteRegisterPositionChanged(connectionPoint);
-            canvas.Children.Remove(face);
-        }
-
-        public void On()
+        public void Show()
         {
             RegisterPositionChanged(connectionPoint);
             canvas.Children.Add(face);
         }
 
-
+        public void Hide()
+        {
+            DeleteRegisterPositionChanged(connectionPoint);
+            canvas.Children.Remove(face);
+        }
 
         private void MoveOffScreen()
         {
@@ -208,6 +206,14 @@ namespace L_system.View
         {
             movingFace = null;
             ResetPosition();
+        }
+
+        public void Dispose()
+        {
+            Hide();
+            canvas.MouseLeftButtonUp -= Reset;
+            canvas.MouseLeave -= Reset;
+            canvas.MouseMove -= DefaultInput_MouseMove;
         }
 
         #endregion

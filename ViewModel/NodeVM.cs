@@ -22,7 +22,6 @@ namespace L_system.ViewModel
             nodeCore.Inputs.CollectionChanged += Inputs_CollectionChanged;
         }
 
-
         public bool CanCreateConnection(int inputIndex, NodeVM prefNode, int outputIndex)
         {
             return nodeCore.CanConnect(inputIndex, prefNode.nodeCore, outputIndex);

@@ -33,43 +33,4 @@ namespace L_system.ViewModel
             inputNode.Disconnect(inputIndex, outputIndex);
         }
     }
-
-    public static class ConnectionSystem
-    {
-        private static NodeVM? OutputNode;
-        private static NodeVM? InputNode;
-
-        private static List<ConnectionVM> connections = new List<ConnectionVM>();
-
-        private static int OutputIndex;
-        private static int InputIndex;
-
-        public static void SetInput(NodeVM inputNode, int inputIndex)
-        {
-            InputNode = inputNode;
-            InputIndex = inputIndex;
-        }
-        public static void SetOutput(NodeVM outputNode, int outputIndex)
-        {
-            OutputNode = outputNode;
-            OutputIndex = outputIndex;
-        }
-
-        public static void StartNewConnection()
-        {
-            OutputNode = null;
-            InputNode = null;
-        }
-
-        public static void EndNewConnection()
-        {
-            if (OutputNode != null && InputNode != null && InputNode != OutputNode)
-            {
-                if (ConnectionVM.CanCreateConnection(OutputNode, OutputIndex, InputNode, InputIndex))
-                {
-                    connections.Add(new ConnectionVM(OutputNode, OutputIndex, InputNode, InputIndex));
-                }
-            }
-        }
-    }
 }

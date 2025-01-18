@@ -1,4 +1,5 @@
 ﻿using L_system.Model.core.Nodes;
+using L_system.Systems;
 using L_system.ViewModel;
 using System.Windows;
 using System.Windows.Controls;
@@ -10,7 +11,7 @@ using System.Windows.Shapes;
 
 namespace L_system.View
 {
-    public class NodeV
+    public class NodeV : IDisposable
     {
         public NodeVM nodeCore;
         public Border face;
@@ -290,6 +291,69 @@ namespace L_system.View
 
         #endregion
 
+        #region Drag
+        double firstXPos, firstYPos;
+        Border? movingFace;
+
+        private void Node_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            movingFace = sender as Border;
+            NodeSystem.ActiveNode = this;
+
+            UpdateZIndex();
+            foreach (var defaultInput in defaultInputs)
+            {
+                defaultInput.face.SetValue(Canvas.ZIndexProperty, Canvas.GetZIndex(movingFace));
+            }
+
+            firstXPos = e.GetPosition(movingFace).X;
+            firstYPos = e.GetPosition(movingFace).Y;
+        }
+
+        private void UpdateZIndex()
+        {
+            int maxZIndex = Canvas.GetZIndex(movingFace);
+            foreach (UIElement child in canvas.Children)
+            {
+                if (maxZIndex < Canvas.GetZIndex(child))
+                    maxZIndex = Canvas.GetZIndex(child);
+            }
+
+            Canvas.SetZIndex(movingFace, maxZIndex + 1);
+        }
+
+        private void Node_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Pressed && movingFace == sender as Border)
+            {
+                double newLeft = e.GetPosition(canvas).X - firstXPos;
+                // newLeft inside canvas right-border?
+                if (newLeft > canvas.ActualWidth - movingFace.ActualWidth)
+                    newLeft = canvas.ActualWidth - movingFace.ActualWidth;
+                // newLeft inside canvas left-border?
+                else if (newLeft < 0)
+                    newLeft = 0;
+                movingFace.SetValue(Canvas.LeftProperty, newLeft);
+
+                double newTop = e.GetPosition(canvas).Y - firstYPos;
+                // newTop inside canvas bottom-border?
+                if (newTop > canvas.ActualHeight - movingFace.ActualHeight)
+                    newTop = canvas.ActualHeight - movingFace.ActualHeight;
+                // newTop inside canvas top-border?
+                else if (newTop < 0)
+                    newTop = 0;
+                movingFace.SetValue(Canvas.TopProperty, newTop);
+            }
+        }
+
+        private void Node_MouseLeave(object sender, MouseEventArgs e)
+        {
+            movingFace = null;
+        }
+
+
+        #endregion
+
         private void OnCollapse(object sender, RoutedEventArgs e)
         {
             MiniSize = !MiniSize;
@@ -363,65 +427,22 @@ namespace L_system.View
             ConnectionSystem.EndNewConnection();
         }
 
-        #region Drag
-        double firstXPos, firstYPos;
-        Border? movingFace;
-
-        private void Node_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        public void Dispose()
         {
-            movingFace = sender as Border;
-
-            UpdateZIndex();
-            foreach (var defaultInput in defaultInputs)
+            foreach (var connection in ConnectionSystem.connections.ToList().Where((a) => a.connectionCore.inputNode == nodeCore))
             {
-                defaultInput.face.SetValue(Canvas.ZIndexProperty, Canvas.GetZIndex(movingFace));
+                connection.Dispose();
+            }
+            foreach (var connection in ConnectionSystem.connections.ToList().Where((a) => a.connectionCore.outputNode == nodeCore))
+            {
+                connection.Dispose();
+            }
+            foreach (var defInput in defaultInputs)
+            {
+                defInput.Dispose();
             }
 
-            firstXPos = e.GetPosition(movingFace).X;
-            firstYPos = e.GetPosition(movingFace).Y;
+            canvas.Children.Remove(face);
         }
-
-        private void UpdateZIndex()
-        {
-            int maxZIndex = Canvas.GetZIndex(movingFace);
-            foreach (UIElement child in canvas.Children)
-            {
-                if (maxZIndex < Canvas.GetZIndex(child))
-                    maxZIndex = Canvas.GetZIndex(child);
-            }
-
-            Canvas.SetZIndex(movingFace, maxZIndex + 1);
-        }
-
-        private void Node_MouseMove(object sender, MouseEventArgs e)
-        {
-            if (e.LeftButton == MouseButtonState.Pressed && movingFace == sender as Border)
-            {
-                double newLeft = e.GetPosition(canvas).X - firstXPos;
-                // newLeft inside canvas right-border?
-                if (newLeft > canvas.ActualWidth - movingFace.ActualWidth)
-                    newLeft = canvas.ActualWidth - movingFace.ActualWidth;
-                // newLeft inside canvas left-border?
-                else if (newLeft < 0)
-                    newLeft = 0;
-                movingFace.SetValue(Canvas.LeftProperty, newLeft);
-
-                double newTop = e.GetPosition(canvas).Y - firstYPos;
-                // newTop inside canvas bottom-border?
-                if (newTop > canvas.ActualHeight - movingFace.ActualHeight)
-                    newTop = canvas.ActualHeight - movingFace.ActualHeight;
-                // newTop inside canvas top-border?
-                else if (newTop < 0)
-                    newTop = 0;
-                movingFace.SetValue(Canvas.TopProperty, newTop);
-            }
-        }
-
-        private void Node_MouseLeave(object sender, MouseEventArgs e)
-        {
-            movingFace = null;
-        }
-
-        #endregion
     }
 }
