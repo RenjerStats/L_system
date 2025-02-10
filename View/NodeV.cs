@@ -57,7 +57,10 @@ namespace L_system.View
             canvas.Children.Add(face);
 
             for (int i = 0; i < core.GetInputsCount(); i++)
-                defaultInputs[i] = new DefaultInputV(core, i, inputsPoint[i], canvas); // Зависит от canvas.Children.Add(face);
+            {
+                if (nodeCore.GetTypeOfInput(i) == "Double")
+                    defaultInputs[i] = new DefaultInputV(core, i, inputsPoint[i], canvas);
+            }
         }
 
         #region Visual
@@ -70,6 +73,7 @@ namespace L_system.View
             form.RowDefinitions[0].Height = new GridLength(20);
             form.RowDefinitions[1].Height = new GridLength(0.45, GridUnitType.Star);
             form.RowDefinitions[2].Height = new GridLength(0.45, GridUnitType.Star);
+
             for (int i = 0; i < 4; i++)
                 form.ColumnDefinitions.Add(new ColumnDefinition());
             bool isInputEmpty = nodeCore.GetInputsCount() == 0;
@@ -98,7 +102,6 @@ namespace L_system.View
             Grid.SetRow(button, 0);
             Grid.SetColumn(button, 3);
             form.Children.Add(button);
-
 
             Grid inputCircles = new Grid();
             for (int i = 0; i < nodeCore.GetInputsCount(); i++)
@@ -303,7 +306,7 @@ namespace L_system.View
             UpdateZIndex();
             foreach (var defaultInput in defaultInputs)
             {
-                defaultInput.face.SetValue(Canvas.ZIndexProperty, Canvas.GetZIndex(movingFace));
+                defaultInput?.face.SetValue(Canvas.ZIndexProperty, Canvas.GetZIndex(movingFace));
             }
 
             firstXPos = e.GetPosition(movingFace).X;
@@ -386,7 +389,7 @@ namespace L_system.View
             face.SetValue(Canvas.TopProperty, (double)face.GetValue(Canvas.TopProperty) - 0.01);
             foreach (var defaultInput in defaultInputs)
             {
-                defaultInput.ResetPosition();
+                defaultInput?.ResetPosition();
             }
         }
 
@@ -396,7 +399,7 @@ namespace L_system.View
             Ellipse point = sender as Ellipse;
             string rowID = point.Tag as string;
 
-            ConnectionSystem.StartNewConnection(face.Parent as Canvas);
+            ConnectionSystem.StartNewConnection();
 
             if (rowID[0] == '-')
             {
@@ -439,7 +442,7 @@ namespace L_system.View
             }
             foreach (var defInput in defaultInputs)
             {
-                defInput.Dispose();
+                defInput?.Dispose();
             }
 
             canvas.Children.Remove(face);

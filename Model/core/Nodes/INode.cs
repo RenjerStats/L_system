@@ -16,7 +16,7 @@ namespace L_system.Model.core.Nodes
         public object[] Parameters { get; set; }
         public string[] NameOfInputs { get; set; }
         public string[] NameOfOutputs { get; set; }
-        public string NameOfNode {  get; set; }
+        public string NameOfNode { get; set; }
     }
 
     public class Node : INode, INotifyPropertyChanged

@@ -17,9 +17,9 @@ namespace L_system.Model.core
         nothingDoing2 = '2',
         nothingDoing3 = '3'
     }
-    public readonly struct Command(CommandType type, float val = 0)
+    public readonly struct Command(CommandType type, double val = 0)
     {
-        public readonly float val = val;
+        public readonly double val = val;
         public readonly CommandType type = type;
 
         public override readonly bool Equals(object? obj)

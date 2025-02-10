@@ -1,13 +1,5 @@
 ﻿using L_system.Model.core.Nodes;
-using L_system.View;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Drawing;
-using System.Linq;
-using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace L_system.ViewModel
 {
@@ -22,30 +14,23 @@ namespace L_system.ViewModel
             nodeCore.Inputs.CollectionChanged += Inputs_CollectionChanged;
         }
 
+        #region Connection
+
         public bool CanCreateConnection(int inputIndex, NodeVM prefNode, int outputIndex)
         {
             return nodeCore.CanConnect(inputIndex, prefNode.nodeCore, outputIndex);
         }
-
         public void CreateConnection(int inputIndex, NodeVM prefNode, int outputIndex)
         {
             nodeCore.Connect(inputIndex, prefNode.nodeCore, outputIndex);
         }
-
         public void Disconnect(int inputIndex, int outputIndex)
         {
             nodeCore.ResetInputToDefault(inputIndex, outputIndex);
         }
+        #endregion
 
-        public int GetInputsCount()
-        {
-            return nodeCore.NameOfInputs == null? 0 : nodeCore.NameOfInputs.Length;
-        }
-
-        public int GetOutputsCount()
-        {
-            return nodeCore.NameOfOutputs == null ? 0 : nodeCore.NameOfOutputs.Length;
-        }
+        #region Names
         public string[] GetNameOfInputs()
         {
             return nodeCore.NameOfInputs;
@@ -58,38 +43,69 @@ namespace L_system.ViewModel
         {
             return nodeCore.NameOfNode;
         }
+        #endregion
 
-        public object GetValueFromOutput(int outputIndex)
+        #region Inputs
+        public int GetInputsCount()
         {
-            return nodeCore.Outputs[outputIndex].GetValue();
+            return nodeCore.Inputs == null ? 0 : nodeCore.Inputs.Count;
         }
-
         public object GetValueFromDefInput(int inputIndex)
         {
             return nodeCore.defaultInputs[inputIndex];
         }
-
         public void SetValueToDefInput(object value, int inputIndex)
         {
             nodeCore.defaultInputs[inputIndex] = value;
         }
-
         public bool IsInputFree(int inputIndex)
         {
             return nodeCore.Inputs[inputIndex] == null;
-        }
-
-        public string GetTypeOfOutput(int outputIndex)
-        {
-            if (nodeCore.Outputs.Length == 0) return "End";
-            return nodeCore.Outputs[outputIndex].GetValue().GetType().Name;
         }
         public string GetTypeOfInput(int inputIndex)
         {
             if (nodeCore.Inputs.Count == 0) return "Empty";
             return nodeCore.defaultInputs[inputIndex].GetType().Name;
         }
+        #endregion
 
+        #region Outputs
+        public object GetValueFromOutput(int outputIndex)
+        {
+            return nodeCore.Outputs[outputIndex].GetValue();
+        }
+        public int GetOutputsCount()
+        {
+            return nodeCore.Outputs == null ? 0 : nodeCore.Outputs.Length;
+        }
+        public string GetTypeOfOutput(int outputIndex)
+        {
+            if (nodeCore.Outputs.Length == 0) return "End";
+            return nodeCore.Outputs[outputIndex].GetValue().GetType().Name;
+        }
+        #endregion
+
+        #region Parameters
+        public int GetCountParameters()
+        {
+            if (nodeCore.Parameters == null) return 0;
+            return nodeCore.Parameters.Length;
+        }
+        public object GetParameter(int index)
+        {
+            return nodeCore.Parameters[index];
+        }
+        public string GetTypeOfParameter(int index)
+        {
+            return nodeCore.Parameters[index].GetType().Name;
+        }
+        public void SetParameter(int index, object value)
+        {
+            nodeCore.Parameters[index] = value;
+        }
+        #endregion
+
+        #region Actions
 
         public void OnOutputChanged(Action action)
         {
@@ -116,5 +132,6 @@ namespace L_system.ViewModel
                 action();
             }
         }
+        #endregion
     }
 }

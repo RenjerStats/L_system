@@ -19,13 +19,44 @@ namespace L_system
         public MainWindow()
         {
             InitializeComponent();
-            NodeV node1 = new NodeV(new(300, 50), new NodeVM(new NodeTime()), NodeCanvas);
-            NodeV node2 = new NodeV(new(600, 50), new NodeVM(new NodeTime()), NodeCanvas);
-            NodeV node3 = new NodeV(new(300, 200), new NodeVM(new NodeDiv()), NodeCanvas);
-            NodeV node4 = new NodeV(new(600, 200), new NodeVM(new NodeSin()), NodeCanvas);
 
+            MenuItem createNodes = HeaderMenu.Items[0] as MenuItem;
+            AddAllNodes(createNodes);
             KeyDown += DeleteNode;
-            NodeCanvas.PreviewMouseLeftButtonDown += NodeCanvas_PreviewMouseLeftButtonDown; ;
+            NodeCanvas.PreviewMouseLeftButtonDown += NodeCanvas_PreviewMouseLeftButtonDown;
+        }
+
+        private void AddAllNodes(MenuItem createNodes)
+        {
+            MenuItem createMenu = HeaderMenu.Items[0] as MenuItem;
+            for (int i = 0; i < NodeSystem.namesOfGroups.Keys.ToArray().Length; i++)
+            {
+                string key = NodeSystem.namesOfGroups.Keys.ToArray()[i];
+                string[] content = NodeSystem.namesOfGroups[key];
+
+
+                MenuItem group = new MenuItem() { Header = key };
+                for (int j = 0; j < content.Length; j++)
+                {
+                    MenuItem node = new MenuItem() { Header = content[j] };
+                    node.Click += CreateNode;
+                    group.Items.Add(node);
+                }
+
+                createMenu.Items.Add(group);
+            }
+        }
+
+        private void CreateNode(object sender, RoutedEventArgs e)
+        {
+            MenuItem item = sender as MenuItem;
+            Random random = new Random();
+            Vector randomOffset = new Point(random.NextDouble(), random.NextDouble()) - new Point(0.5, 0.5);
+            randomOffset *= 75;
+            randomOffset -= new Vector(75, 75); // Центрирование ноды
+
+            Vector position = new Vector(NodeCanvas.ActualWidth/2, NodeCanvas.ActualHeight/2) + randomOffset;
+            NodeSystem.CreateNode((Point)position, NodeCanvas, item.Header.ToString());
         }
 
         private void NodeCanvas_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e) => NodeSystem.ActiveNode = null;

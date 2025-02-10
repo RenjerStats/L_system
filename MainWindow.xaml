@@ -12,6 +12,30 @@
         ResizeMode="CanResizeWithGrip"
         WindowStartupLocation="CenterScreen"
         >
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="25"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
 
-    <Canvas Name="NodeCanvas" Focusable="True" Background="MidnightBlue"/>
+        <Menu Name="HeaderMenu" Grid.Row="0" Height="25" VerticalAlignment="Top">
+            <MenuItem Header="Создать ноду"/>
+        </Menu>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"  VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                <Canvas Name="NodeCanvas" Background="#FF330055"/>
+            </ScrollViewer>
+            
+            <GridSplitter Grid.Column="1" ShowsPreview="False" Width="3" HorizontalAlignment="Center" VerticalAlignment="Stretch" />
+            <Canvas Grid.Column="2" Name="RenderCanvas" Background="#FF222233"/>
+        </Grid>
+        
+       
+    </Grid>
 </Window>

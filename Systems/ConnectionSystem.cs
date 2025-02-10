@@ -12,7 +12,6 @@ namespace L_system.Systems
 {
     public static class ConnectionSystem
     {
-        private static Canvas Canvas;
         private static NodeV? OutputNode;
         private static NodeV? InputNode;
 
@@ -38,9 +37,8 @@ namespace L_system.Systems
             OutputPoint = outputPoint;
         }
 
-        public static void StartNewConnection(Canvas canvas)
+        public static void StartNewConnection()
         {
-            Canvas = canvas;
             OutputNode = null;
             InputNode = null;
             InputPoint = null;
@@ -55,12 +53,14 @@ namespace L_system.Systems
                 {
                     if (!InputNode.nodeCore.IsInputFree(InputIndex))
                     {
-                        ConnectionV connectionWithSameInput = connections.Where((a) => a.connectionCore.inputNode == InputNode.nodeCore).ToArray()[0];
+                        Func<ConnectionV, bool> isConnectionWithSameInput = (a) => a.connectionCore.inputIndex == InputIndex && a.connectionCore.inputNode == InputNode.nodeCore;
+                        ConnectionV connectionWithSameInput = connections.Where(isConnectionWithSameInput).ToArray()[0];
                         connectionWithSameInput.Dispose();
                     }
                     ConnectionVM core = new ConnectionVM(OutputNode.nodeCore, OutputIndex, InputNode.nodeCore, InputIndex);
-                    ConnectionV connection = new ConnectionV(core, OutputPoint, InputPoint, Canvas);
 
+                    Canvas canvas = (Canvas)InputNode.face.Parent;
+                    ConnectionV connection = new ConnectionV(core, OutputPoint, InputPoint, canvas);
 
                     connections.Add(connection);
                 }

@@ -13,10 +13,10 @@ namespace L_system.Model.core.Nodes
         {
             defaultInputs = [1.0D, 2.0D];
             Inputs = new ObservableCollection<InputOfNode>(new InputOfNode[2]);
-            Outputs = [new OutputOfNode(GetOutput)]; // самозацикливание
+            Outputs = [new OutputOfNode(GetOutput)];
             NameOfNode = "Сложение";
-            NameOfInputs = ["Слагаемое", "Слагаемое"];
-            NameOfOutputs = ["Сумма"];
+            NameOfInputs = ["A", "B"];
+            NameOfOutputs = ["A+B"];
 
             FinalNodeConstructor();
         }
@@ -35,8 +35,8 @@ namespace L_system.Model.core.Nodes
             defaultInputs = [1.0D, 2.0D];
             Outputs = [new OutputOfNode(GetOutput)];
             NameOfNode = "Вычитание";
-            NameOfInputs = ["Уменьшаемое", "Вычитаемое"];
-            NameOfOutputs = ["Разность"];
+            NameOfInputs = ["A", "B"];
+            NameOfOutputs = ["A-B"];
 
             FinalNodeConstructor();
         }
@@ -55,8 +55,8 @@ namespace L_system.Model.core.Nodes
             defaultInputs = [1.0D, 2.0D];
             Outputs = [new OutputOfNode(GetOutput)];
             NameOfNode = "Умножение";
-            NameOfInputs = ["Множитель", "Множитель"];
-            NameOfOutputs = ["Произведение"];
+            NameOfInputs = ["A", "B"];
+            NameOfOutputs = ["A*B"];
 
             FinalNodeConstructor();
         }
@@ -75,8 +75,8 @@ namespace L_system.Model.core.Nodes
             defaultInputs = [1.0D, 2.0D];
             Outputs = [new OutputOfNode(GetOutput)];
             NameOfNode = "Деление";
-            NameOfInputs = ["Делимое", "Делитель"];
-            NameOfOutputs = ["Частное"];
+            NameOfInputs = ["A", "B"];
+            NameOfOutputs = ["A/B"];
 
             FinalNodeConstructor();
         }

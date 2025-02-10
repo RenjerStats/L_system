@@ -13,7 +13,7 @@ namespace L_system.Model.core.Nodes
             defaultInputs = [axiom, change, to];
             Outputs = [new OutputOfNode(GetResult)];
             NameOfNode = "Замена";
-            NameOfInputs = ["Команды", "Заменяемое", "Заменитель"];
+            NameOfInputs = ["Команды", "Заменить", "На"];
             NameOfOutputs = ["Результат"];
 
             FinalNodeConstructor();
