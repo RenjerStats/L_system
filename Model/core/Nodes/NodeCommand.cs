@@ -12,7 +12,7 @@ namespace L_system.Model.core.Nodes
     {
         public NodeCommand()
         {
-            defaultInputs = [new List<Command>(), 50D];
+            defaultInputs = [Array.Empty<Command>(), 50D];
             Inputs = new ObservableCollection<InputOfNode>(new InputOfNode[2]);
             NameOfInputs = ["Команды", "Число"];
             NameOfOutputs = ["Команды"];
@@ -22,10 +22,14 @@ namespace L_system.Model.core.Nodes
         protected CommandType typeNode;
         protected object GetResult()
         {
-            List<Command> list = Inputs[0] == null ? (List<Command>)defaultInputs[0] : (List<Command>)Inputs[0].GetValue();
+            Command[] oldCommands = Inputs[0] == null ? (Command[])defaultInputs[0] : (Command[])Inputs[0].GetValue();
             Double value = Inputs.Count == 1 ? 0 : (Inputs[1] == null ? (Double)defaultInputs[1] : (Double)Inputs[1].GetValue());
-            list.Add(new Command(typeNode, value));
-            return list;
+
+            Command[] newCommands = new Command[oldCommands.Length+1];
+            oldCommands.CopyTo(newCommands, 0);
+            newCommands[^1] = new Command(typeNode, value);
+
+            return newCommands;
         }
     }
 
@@ -68,7 +72,7 @@ namespace L_system.Model.core.Nodes
         {
             NameOfNode = "Сохранение";
             Inputs = new ObservableCollection<InputOfNode>(new InputOfNode[1]);
-            defaultInputs = [new List<Command>()];
+            defaultInputs = [Array.Empty<Command>()];
             NameOfInputs = ["Команды"];
             typeNode = CommandType.save;
 
@@ -81,7 +85,7 @@ namespace L_system.Model.core.Nodes
         {
             NameOfNode = "Загрузка";
             Inputs = new ObservableCollection<InputOfNode>(new InputOfNode[1]);
-            defaultInputs = [new List<Command>()];
+            defaultInputs = [Array.Empty<Command>()];
             NameOfInputs = ["Команды"];
             typeNode = CommandType.load;
 
@@ -94,7 +98,7 @@ namespace L_system.Model.core.Nodes
         {
             NameOfNode = "Пустая команда1";
             Inputs = new ObservableCollection<InputOfNode>(new InputOfNode[1]);
-            defaultInputs = [new List<Command>()];
+            defaultInputs = [Array.Empty<Command>()];
             NameOfInputs = ["Команды"];
             typeNode = CommandType.nothingDoing1;
 
@@ -107,7 +111,7 @@ namespace L_system.Model.core.Nodes
         {
             NameOfNode = "Пустая команда2";
             Inputs = new ObservableCollection<InputOfNode>(new InputOfNode[1]);
-            defaultInputs = [new List<Command>()];
+            defaultInputs = [Array.Empty<Command>()];
             NameOfInputs = ["Команды"];
             typeNode = CommandType.nothingDoing2;
 
@@ -120,7 +124,7 @@ namespace L_system.Model.core.Nodes
         {
             NameOfNode = "Пустая команда3";
             Inputs = new ObservableCollection<InputOfNode>(new InputOfNode[1]);
-            defaultInputs = [new List<Command>()];
+            defaultInputs = [Array.Empty<Command>()];
             NameOfInputs = ["Команды"];
             typeNode = CommandType.nothingDoing3;
 

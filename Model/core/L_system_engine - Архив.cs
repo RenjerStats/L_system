@@ -1,10 +1,9 @@
 ﻿namespace L_system.Model.core
 {
-    public class L_system_engine(Command[] axiom, Command change, Command[] to)
+    public class L_system_engine_Archive(Command[] axiom, Dictionary<Command, Command[]> changeTo)
     {
         private List<Command> axiom = new(axiom);
-        private readonly Command change = change;
-        private readonly Command[] to = to;
+        private readonly Dictionary<Command, Command[]> changeTo = changeTo;
 
         public Command[] GetCommands() => axiom.ToArray();
 
@@ -12,16 +11,19 @@
         {
             List<int> indexWhatAlreadyBeenUsed = [];
 
-            for (int i = 0; i < axiom.Count; i++)
+            foreach (var change in changeTo.Keys)
             {
-                if (!indexWhatAlreadyBeenUsed.Contains(i) && change == axiom[i])
+                var to = changeTo[change];
+                for (int i = 0; i < axiom.Count; i++)
                 {
-                    InsertingListWithReplacement(i, to);
-                    for (int q = 0; q < to.Length; q++)
-                        indexWhatAlreadyBeenUsed.Add(i + q);
+                    if (!indexWhatAlreadyBeenUsed.Contains(i) && change == axiom[i])
+                    {
+                        InsertingListWithReplacement(i, to);
+                        for (int q = 0; q < to.Length; q++)
+                            indexWhatAlreadyBeenUsed.Add(i + q);
+                    }
                 }
             }
-
         }
 
         private void InsertingListWithReplacement(int index, Command[] to)

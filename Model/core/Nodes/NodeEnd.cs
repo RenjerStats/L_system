@@ -11,13 +11,19 @@ namespace L_system.Model.core.Nodes
     {
         public NodeEnd()
         {
-            defaultInputs = [new List<Command>()];
+            defaultInputs = [Array.Empty<Command>()];
             Inputs = new ObservableCollection<InputOfNode>(new InputOfNode[1]);
             Outputs = [];
             NameOfNode = "Отрисовка";
             NameOfInputs = ["На отрисовку"];
 
             FinalNodeConstructor();
+        }
+
+        public Command[] GetCommands()
+        {
+            Command[] commands = Inputs[0] == null ? (Command[])defaultInputs[0] : (Command[])Inputs[0].GetValue();
+            return commands;
         }
     }
 }

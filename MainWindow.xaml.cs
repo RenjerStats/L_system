@@ -1,12 +1,8 @@
-﻿using L_system.Model.core.Nodes;
+﻿using DrawTest;
 using L_system.Systems;
-using L_system.View;
-using L_system.ViewModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Shapes;
 
 namespace L_system
 {
@@ -15,18 +11,32 @@ namespace L_system
     /// </summary>
     public partial class MainWindow : Window
     {
-
+        private UpdateSystem updateSystem;
         public MainWindow()
         {
             InitializeComponent();
 
-            MenuItem createNodes = HeaderMenu.Items[0] as MenuItem;
-            AddAllNodes(createNodes);
+            MenuItem menuCreateNodes = HeaderMenu.Items[0] as MenuItem;
+            InitializeNodeInMenu(menuCreateNodes);
             KeyDown += DeleteNode;
             NodeCanvas.PreviewMouseLeftButtonDown += NodeCanvas_PreviewMouseLeftButtonDown;
+
+            InitializeUpdateSystem();
+
+            updateSystem.StartUpdating();
         }
 
-        private void AddAllNodes(MenuItem createNodes)
+        private void InitializeUpdateSystem()
+        {
+            DrawingCanvas canvas = new DrawingCanvas();
+            RenderCanvas.Children.Add(canvas);
+            updateSystem = new UpdateSystem(canvas);
+            updateSystem.SetFrameRate(30);
+
+            RenderCanvas.SizeChanged += updateSystem.ResetSizeDrawingArea;
+        }
+
+        private void InitializeNodeInMenu(MenuItem createNodes)
         {
             MenuItem createMenu = HeaderMenu.Items[0] as MenuItem;
             for (int i = 0; i < NodeSystem.namesOfGroups.Keys.ToArray().Length; i++)
@@ -55,7 +65,7 @@ namespace L_system
             randomOffset *= 75;
             randomOffset -= new Vector(75, 75); // Центрирование ноды
 
-            Vector position = new Vector(NodeCanvas.ActualWidth/2, NodeCanvas.ActualHeight/2) + randomOffset;
+            Vector position = new Vector(NodeCanvas.ActualWidth / 2, NodeCanvas.ActualHeight / 2) + randomOffset;
             NodeSystem.CreateNode((Point)position, NodeCanvas, item.Header.ToString());
         }
 
@@ -65,7 +75,7 @@ namespace L_system
         {
             if (e.Key == Key.Delete && NodeSystem.ActiveNode != null)
             {
-                NodeSystem.ActiveNode.Dispose();
+                NodeSystem.DeleteActiveNode();
             }
         }
     }

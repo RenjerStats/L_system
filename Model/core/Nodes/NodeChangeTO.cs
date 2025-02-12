@@ -6,11 +6,8 @@ namespace L_system.Model.core.Nodes
     {
         public NodeChangeTO()
         {
-            object axiom = new Command[] { new Command(CommandType.nothingDoing1) };
-            object change = new Command(CommandType.nothingDoing1);
-            object to = new Command[] { new Command(CommandType.nothingDoing1) };
             Inputs = new ObservableCollection<InputOfNode>(new InputOfNode[3]);
-            defaultInputs = [axiom, change, to];
+            defaultInputs = [Array.Empty<Command>(), Array.Empty<Command>(), Array.Empty<Command>()];
             Outputs = [new OutputOfNode(GetResult)];
             NameOfNode = "Замена";
             NameOfInputs = ["Команды", "Заменить", "На"];
@@ -21,11 +18,10 @@ namespace L_system.Model.core.Nodes
 
         public Command[] GetResult()
         {
-            object axiom = Inputs[0] == null? defaultInputs[0] : Inputs[0].GetValue();
-            object change = Inputs[1] == null? defaultInputs[1] : Inputs[1].GetValue();
-            object to = Inputs[2] == null? defaultInputs[2] : Inputs[2].GetValue();
-            L_system_engine engine = new L_system_engine((Command[])axiom,
-                                         EngineTools.ToDictionary([(Command)change], [(Command[])to ]));
+            Command[] axiom = Inputs[0] == null? (Command[])defaultInputs[0] : (Command[])Inputs[0].GetValue();
+            Command[] change = Inputs[1] == null? (Command[])defaultInputs[1] : (Command[])Inputs[1].GetValue();
+            Command[] to = Inputs[2] == null? (Command[])defaultInputs[2] : (Command[])Inputs[2].GetValue();
+            L_system_engine engine = new L_system_engine(axiom, change[^1], to);
 
             engine.Iterate();
 

@@ -1,4 +1,5 @@
-﻿using L_system.Model.core.Nodes;
+﻿using L_system.Model.core;
+using L_system.Model.core.Nodes;
 using L_system.View;
 using L_system.ViewModel;
 using System;
@@ -15,26 +16,27 @@ namespace L_system.Systems
     public static class NodeSystem
     {
         public static List<NodeV> nodes = new List<NodeV>();
+        public static Dictionary<NodeV, NodeEnd> nodesEnd = new Dictionary<NodeV, NodeEnd>();
 
         #region CreateNodes
-        private static Dictionary<string, Func<NodeVM>> namesOfNodes = new Dictionary<string, Func<NodeVM>>(){
-            { "Нода умножения", () => new NodeVM(new NodeMult()) },    // 0
-            { "Нода деления", () => new NodeVM(new NodeDiv()) },       // 1
-            { "Нода сложения", () => new NodeVM(new NodePlus()) },     // 2
-            { "Нода вычитания", () => new NodeVM(new NodeSub()) },     // 3
-            { "Нода синуса", () => new NodeVM(new NodeSin()) },        // 4
-            { "Нода времени", () => new NodeVM(new NodeTime()) },      // 5
-            { "Нода замены", () => new NodeVM(new NodeChangeTO()) },   // 6
-            { "Нода отрисовки", () => new NodeVM(new NodeEnd()) },     // 7
-            { "Числовая нода", () => new NodeVM(new NodeConstant()) },  // 8
-            { "Нарисовать линию", () => new NodeVM(new NodeMove()) },    // 9
-            { "Повернуть перо", () => new NodeVM(new NodeRotate()) },     // 10
-            { "Переместить перо", () => new NodeVM(new NodeJump()) },      // 11
-            { "Сохранить позицию пера", () => new NodeVM(new NodeSave()) }, // 12
-            { "Загрузить позицию пера", () => new NodeVM(new NodeLoad()) }, // 13
-            { "Пустое действие1", () => new NodeVM(new  NodeNothing1()) }, // 14
-            { "Пустое действие2", () => new NodeVM(new NodeNothing2()) }, // 15
-            { "Пустое действие3", () => new NodeVM(new NodeNothing3()) }, // 16
+        private static Dictionary<string, Func<Node>> namesOfNodes = new Dictionary<string, Func<Node>>(){
+            { "Нода умножения", () => new NodeMult() },    // 0
+            { "Нода деления", () => new NodeDiv() },       // 1
+            { "Нода сложения", () => new NodePlus() },     // 2
+            { "Нода вычитания", () => new NodeSub() },     // 3
+            { "Нода синуса", () => new NodeSin() },        // 4
+            { "Нода времени", () => new NodeTime() },      // 5
+            { "Нода замены", () => new NodeChangeTO() },   // 6
+            { "Нода отрисовки", () => new NodeEnd() },     // 7
+            { "Числовая нода", () => new NodeConstant() },  // 8
+            { "Нарисовать линию", () => new NodeMove() },    // 9
+            { "Повернуть перо", () => new NodeRotate() },     // 10
+            { "Переместить перо", () => new NodeJump() },      // 11
+            { "Сохранить позицию пера", () => new NodeSave() }, // 12
+            { "Загрузить позицию пера", () => new NodeLoad() }, // 13
+            { "Пустое действие1", () => new NodeNothing1() },  // 14
+            { "Пустое действие2", () => new NodeNothing2() }, // 15
+            { "Пустое действие3", () => new NodeNothing3() }, // 16
         };
 
         public static Dictionary<string, string[]> namesOfGroups = new Dictionary<string, string[]>(){
@@ -52,10 +54,21 @@ namespace L_system.Systems
 
         public static void CreateNode(Point position, Canvas canvas, string name)
         {
-            nodes.Add(new NodeV(position, namesOfNodes[name].Invoke(), canvas));
+            Node core = namesOfNodes[name].Invoke();
+            NodeV newNode = new NodeV(position, new NodeVM(core), canvas);
+            if (core is NodeEnd) nodesEnd.Add(newNode, core as NodeEnd);
+            nodes.Add(newNode);
         }
 
         #endregion
+
+        static public IEnumerable<Command[]> GetCommandsFromAllNodesEnd()
+        {
+            foreach (var item in nodesEnd.Values)
+            {
+                yield return item.GetCommands();
+            }
+        }
 
         #region ActiveNode
         private static NodeV activeNode;
@@ -64,10 +77,7 @@ namespace L_system.Systems
             get { return activeNode; }
             set
             {
-                if (activeNode != value)
-                {
-                    ActiveNodeChange();
-                }
+                if (activeNode != value) ActiveNodeChange();      
                 activeNode = value;
             }
         }
@@ -83,6 +93,14 @@ namespace L_system.Systems
             {
                 action();
             }
+        }
+
+        public static void DeleteActiveNode()
+        {
+            if (activeNode.nodeCore.GetOutputsCount() == 0) nodesEnd.Remove(activeNode);
+            nodes.Remove(activeNode);
+            activeNode.Dispose();
+            activeNode = null;
         }
         #endregion
     }
