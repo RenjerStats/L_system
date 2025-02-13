@@ -1,15 +1,15 @@
 ﻿using System.Collections.ObjectModel;
+using System.Windows.Threading;
 
 namespace L_system.Model.core.Nodes
 {
     internal class NodeTime : Node
     {
         private ulong counter = 1;
-        private int oldPeriod = 1;
-        private Timer timer;
+        private DispatcherTimer timer;
         public NodeTime()
         {
-            defaultInputs = [(double)oldPeriod];
+            defaultInputs = [1D];
 
             Inputs = new ObservableCollection<InputOfNode>(new InputOfNode[1]);
             Outputs = [new OutputOfNode(() => (double)counter)];
@@ -19,17 +19,17 @@ namespace L_system.Model.core.Nodes
 
             FinalNodeConstructor();
 
-            timer = new Timer(UpdateOutput, null, 0, 1);
+            timer = new DispatcherTimer(DispatcherPriority.Input);
+            timer.Tick += OnTimerTick;
+            timer.Start();
         }
 
-
-        private void UpdateOutput(object? state)
+        private void OnTimerTick(object sender, EventArgs e)
         {
             int period = Inputs[0] == null ? Convert.ToInt32(defaultInputs[0]) : Convert.ToInt32(Inputs[0].GetValue());
-            if (period != oldPeriod)
+            if (timer.Interval != TimeSpan.FromMilliseconds(period))
             {
-                timer.Change(0, period);
-                oldPeriod = period;
+                timer.Interval = TimeSpan.FromMilliseconds(period);
             }
             counter++;
             OnPropertyChanged("Outputs");
@@ -37,7 +37,7 @@ namespace L_system.Model.core.Nodes
 
         ~NodeTime()
         {
-            timer.Dispose();
+            timer.Stop();
         }
     }
 }

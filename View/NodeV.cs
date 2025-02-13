@@ -185,11 +185,7 @@ namespace L_system.View
                     TextBox preview = CreateSimpleText($"Выходное значение:\n\n{value:G10}");
                     nodeCore.OnOutputChanged(() =>
                     {
-                        // Используем Dispatcher для изменения текста в UI-потоке
-                        preview.Dispatcher.BeginInvoke(() =>
-                        {
-                            preview.Text = $"Выходное значение:\n\n{nodeCore.GetValueFromOutput(0):F5}";
-                        });
+                        preview.Text = $"Выходное значение:\n\n{nodeCore.GetValueFromOutput(0):F5}";
                     });
                     preview.VerticalAlignment = VerticalAlignment.Center;
                     preview.FontSize = 14;

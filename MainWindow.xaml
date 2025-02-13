@@ -33,7 +33,7 @@
             </ScrollViewer>
             
             <GridSplitter Grid.Column="1" ShowsPreview="False" Width="3" HorizontalAlignment="Center" VerticalAlignment="Stretch" />
-            <Canvas Grid.Column="2" Name="RenderCanvas" Background="#FF222233"/>
+            <Canvas ClipToBounds="True" Grid.Column="2" Name="RenderCanvas" Background="#FF222233"/>
         </Grid>
         
        

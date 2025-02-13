@@ -7,7 +7,7 @@ namespace L_system.Model.core.Nodes
         public NodeChangeTO()
         {
             Inputs = new ObservableCollection<InputOfNode>(new InputOfNode[3]);
-            defaultInputs = [Array.Empty<Command>(), Array.Empty<Command>(), Array.Empty<Command>()];
+            defaultInputs = [new Command[] {new(CommandType.nothingDoing1)}, new Command[] { new(CommandType.nothingDoing1) }, new Command[] { new(CommandType.nothingDoing1) }];
             Outputs = [new OutputOfNode(GetResult)];
             NameOfNode = "Замена";
             NameOfInputs = ["Команды", "Заменить", "На"];

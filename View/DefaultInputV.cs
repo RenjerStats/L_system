@@ -10,12 +10,15 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 using Windows.Foundation.Collections;
 
 namespace L_system.View
 {
     public class DefaultInputV : IDisposable
     {
+        private readonly DispatcherTimer timer;
+
         private NodeVM node;
         private int inputIndex;
         private Ellipse connectionPoint;
@@ -31,13 +34,15 @@ namespace L_system.View
             this.connectionPoint = connectionPoint;
             this.canvas = canvas;
 
+            timer = new DispatcherTimer();
+            timer.Interval = TimeSpan.FromSeconds(1.0 / 60);
+            timer.Tick += OnTimerTick;
+
             node.OnInputsChanged(ShowOrNotDefaultInput);
 
             face = CreateForm();
             face.Loaded += Face_Loaded;
 
-            face.MouseMove += DefaultInput_MouseMove;
-            canvas.MouseMove += DefaultInput_MouseMove;
             face.MouseLeftButtonDown += DefaultInput_MouseLeftButtonDown;
             face.MouseLeftButtonUp += Reset;
             canvas.MouseLeftButtonUp += Reset;
@@ -85,6 +90,7 @@ namespace L_system.View
             face.SetValue(Canvas.LeftProperty, GetXPositionConnectionPoint() - 60);
             face.SetValue(Canvas.TopProperty, GetYPositionConnectionPoint() - 10);
         }
+
         private double GetXPositionConnectionPoint()
         {
             return connectionPoint.TranslatePoint(new Point(connectionPoint.Width / 2, connectionPoint.Height / 2), canvas).X;
@@ -99,10 +105,7 @@ namespace L_system.View
             TextBox child = CreateSimpleText($"{node.GetValueFromDefInput(inputIndex):F3}");
 
             node.OnOutputChanged(() => {
-                child.Dispatcher.BeginInvoke(() =>
-                {
-                    child.Text = $"{node.GetValueFromDefInput(inputIndex):F3}";
-                });
+                child.Text = $"{node.GetValueFromDefInput(inputIndex):F3}";
             });
 
             return new Border()
@@ -173,29 +176,28 @@ namespace L_system.View
             Canvas.SetZIndex(movingFace, top + 1);
 
             firstYPos = e.GetPosition(movingFace).Y;
+
+            timer.Start();
         }
 
-        private void DefaultInput_MouseMove(object sender, MouseEventArgs e)
+        private void OnTimerTick(object? sender, EventArgs e)
         {
-            if (e.LeftButton == MouseButtonState.Pressed && movingFace != null)
-            {
-                double newTop = e.GetPosition(canvas).Y - firstYPos;
+            double newTop = Mouse.GetPosition(canvas).Y - firstYPos;
 
-                if (newTop > canvas.ActualHeight - movingFace.ActualHeight)
-                    newTop = canvas.ActualHeight - movingFace.ActualHeight;
+            if (newTop > canvas.ActualHeight - movingFace.ActualHeight)
+                newTop = canvas.ActualHeight - movingFace.ActualHeight;
 
-                else if (newTop < 0)
-                    newTop = 0;
-                movingFace.SetValue(Canvas.TopProperty, newTop);
+            else if (newTop < 0)
+                newTop = 0;
+            movingFace.SetValue(Canvas.TopProperty, newTop);
 
-                UpdateDefaultValue();
-            }
+            UpdateDefaultValue();
         }
 
         private void UpdateDefaultValue()
         {
             double difference = Mouse.GetPosition(canvas).Y - GetYPositionConnectionPoint();
-            double offsetY = difference / 1000;
+            double offsetY = difference / 300;
             offsetY = offsetY * Math.Abs(offsetY);
 
             double newValue = (double)node.GetValueFromDefInput(inputIndex) - offsetY;
@@ -205,6 +207,7 @@ namespace L_system.View
         private void Reset(object sender, MouseEventArgs e)
         {
             movingFace = null;
+            timer.Stop();
             ResetPosition();
         }
 
@@ -213,7 +216,6 @@ namespace L_system.View
             Hide();
             canvas.MouseLeftButtonUp -= Reset;
             canvas.MouseLeave -= Reset;
-            canvas.MouseMove -= DefaultInput_MouseMove;
         }
 
         #endregion

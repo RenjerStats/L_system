@@ -54,11 +54,7 @@ namespace L_system.Systems
         public void StartUpdating() => timer.Start();
         public void StopUpdating() => timer.Stop();
 
-        internal void SetFrameRate(int frameRate)
-        {
-            SetUpdateFrameRate(frameRate);
-        }
-        public void SetUpdateFrameRate(int frameRate)
+        public void SetFrameRate(int frameRate)
         {
             if (frameRate <= 0) throw new ArgumentException("frameRate must be positive");
             timer.Interval = TimeSpan.FromSeconds(1.0 / frameRate);
