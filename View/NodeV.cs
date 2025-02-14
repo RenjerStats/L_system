@@ -11,7 +11,7 @@ using System.Windows.Shapes;
 
 namespace L_system.View
 {
-    public class NodeV : IDisposable
+    public class NodeV : IDisposable  // весит примерно 2 мб в оперативке
     {
         public NodeVM nodeCore;
         public Border face;
@@ -309,16 +309,16 @@ namespace L_system.View
             firstYPos = e.GetPosition(movingFace).Y;
         }
 
-        private void UpdateZIndex()
+        public void UpdateZIndex()
         {
-            int maxZIndex = Canvas.GetZIndex(movingFace);
+            int maxZIndex = Canvas.GetZIndex(face);
             foreach (UIElement child in canvas.Children)
             {
                 if (maxZIndex < Canvas.GetZIndex(child))
                     maxZIndex = Canvas.GetZIndex(child);
             }
 
-            Canvas.SetZIndex(movingFace, maxZIndex + 1);
+            Canvas.SetZIndex(face, maxZIndex + 1);
         }
 
         private void Node_MouseMove(object sender, MouseEventArgs e)

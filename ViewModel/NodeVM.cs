@@ -14,6 +14,11 @@ namespace L_system.ViewModel
             nodeCore.Inputs.CollectionChanged += Inputs_CollectionChanged;
         }
 
+        public Node GetCopyCore()
+        {
+            return nodeCore.Copy();
+        }
+
         #region Connection
 
         public bool CanCreateConnection(int inputIndex, NodeVM prefNode, int outputIndex)

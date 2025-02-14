@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace L_system.Systems
 {
@@ -56,19 +57,12 @@ namespace L_system.Systems
         {
             Node core = namesOfNodes[name].Invoke();
             NodeV newNode = new NodeV(position, new NodeVM(core), canvas);
+            newNode.UpdateZIndex();
             if (core is NodeEnd) nodesEnd.Add(newNode, core as NodeEnd);
             nodes.Add(newNode);
         }
 
         #endregion
-
-        static public IEnumerable<Command[]> GetCommandsFromAllNodesEnd()
-        {
-            foreach (var item in nodesEnd.Values)
-            {
-                yield return item.GetCommands();
-            }
-        }
 
         #region ActiveNode
         private static NodeV activeNode;
@@ -103,5 +97,41 @@ namespace L_system.Systems
             activeNode = null;
         }
         #endregion
+
+        #region Duplicate
+        public static void DuplicateActiveNode(object sender, KeyEventArgs e)
+        {
+            if (activeNode == null) return;
+            Canvas canvas = activeNode.canvas;
+            if (Keyboard.Modifiers == ModifierKeys.Control)
+            {
+                if (e.Key == Key.D)
+                {
+                    Duplicate(canvas);
+                }
+            }
+        }
+
+        private static void Duplicate(Canvas canvas)
+        {
+            Point position = Mouse.GetPosition(canvas);
+            position -= new Vector(75, 75); // Центрирование ноды
+            Node core = activeNode.nodeCore.GetCopyCore();
+            NodeV dupNode = new NodeV(position, new NodeVM(core), canvas);
+            dupNode.UpdateZIndex();
+
+            nodes.Add(dupNode);
+            if (core is NodeEnd) nodesEnd.Add(dupNode, core as NodeEnd);
+        }
+        #endregion
+
+
+        static public IEnumerable<Command[]> GetCommandsFromAllNodesEnd()
+        {
+            foreach (var item in nodesEnd.Values)
+            {
+                yield return item.GetCommands();
+            }
+        }
     }
 }

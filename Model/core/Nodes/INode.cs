@@ -83,5 +83,18 @@ namespace L_system.Model.core.Nodes
                 node?.OnPropertyChanged("Outputs");
             }
         }
+
+        public Node Copy() {
+            var type = GetType();
+
+            var newNode = (Node)Activator.CreateInstance(type);
+
+            for (int i = 0; i < defaultInputs.Count; i++)
+            {
+                newNode.defaultInputs[i] = defaultInputs[i];
+            }
+
+            return newNode;
+        }
     }
 }

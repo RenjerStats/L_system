@@ -18,13 +18,17 @@ namespace L_system
 
             MenuItem menuCreateNodes = HeaderMenu.Items[0] as MenuItem;
             InitializeNodeInMenu(menuCreateNodes);
+
             KeyDown += DeleteNode;
             NodeCanvas.PreviewMouseLeftButtonDown += NodeCanvas_PreviewMouseLeftButtonDown;
+            KeyDown += NodeSystem.DuplicateActiveNode;
 
             InitializeUpdateSystem();
 
             updateSystem.StartUpdating();
         }
+
+
 
         private void InitializeUpdateSystem()
         {

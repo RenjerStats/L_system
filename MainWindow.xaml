@@ -28,10 +28,8 @@
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
-            <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"  VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
-                <Canvas Name="NodeCanvas" Background="#FF330055"/>
-            </ScrollViewer>
-            
+
+            <Canvas Name="NodeCanvas" Background="#FF330055"/>
             <GridSplitter Grid.Column="1" ShowsPreview="False" Width="3" HorizontalAlignment="Center" VerticalAlignment="Stretch" />
             <Canvas ClipToBounds="True" Grid.Column="2" Name="RenderCanvas" Background="#FF222233"/>
         </Grid>

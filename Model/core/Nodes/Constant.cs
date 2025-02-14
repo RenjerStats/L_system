@@ -14,15 +14,5 @@ namespace L_system.Model.core.Nodes
 
             FinalNodeConstructor();
         }
-        public NodeConstant(object value)
-        {
-            defaultInputs = [value];
-            Inputs = new ObservableCollection<InputOfNode>();
-            Outputs = [new OutputOfNode(() => value)];
-            NameOfOutputs = ["Значение"];
-            NameOfNode = "Константа";
-
-            FinalNodeConstructor();
-        }
     }
 }
