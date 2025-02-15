@@ -98,8 +98,8 @@ namespace L_system.Systems
         }
         #endregion
 
-        #region Duplicate
-        public static void DuplicateActiveNode(object sender, KeyEventArgs e)
+        #region ActionWithKeyPress
+        public static void KeyPressed(object sender, KeyEventArgs e)
         {
             if (activeNode == null) return;
             Canvas canvas = activeNode.canvas;
@@ -109,6 +109,10 @@ namespace L_system.Systems
                 {
                     Duplicate(canvas);
                 }
+            }
+            else if (Keyboard.Modifiers == ModifierKeys.None && e.Key == Key.M)
+            {
+                activeNode.Flip();
             }
         }
 

@@ -2,6 +2,8 @@
 using L_system.Systems;
 using L_system.ViewModel;
 using System.ComponentModel;
+using System.Net;
+using System.Security.Claims;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -13,23 +15,35 @@ namespace L_system.View
     public class ConnectionV : IDisposable
     {
         public ConnectionVM connectionCore;
+        private NodeV inputNode;
+        private NodeV outputNode;
         private Ellipse outputPoint;
         private Ellipse inputPoint;
         private Canvas canvas;
         public Path face;
 
-        public ConnectionV(ConnectionVM connectionCore, Ellipse outputPoint, Ellipse inputPoint, Canvas canvas)
+        public ConnectionV(ConnectionVM connectionCore, Canvas canvas)
         {
             this.connectionCore = connectionCore;
-            this.outputPoint = outputPoint;
-            this.inputPoint = inputPoint;
             this.canvas = canvas;
+        }
+        public void SetInputNode(NodeV node, Ellipse point)
+        {
+            inputPoint = point;
+            inputNode = node;
+
+            RegisterPositionChanged(inputPoint);
+        }
+        public void SetOutputNode(NodeV node, Ellipse point)
+        {
+            outputPoint = point;
+            outputNode = node;
+            RegisterPositionChanged(outputPoint);
+        }
+        public void EndCreate()
+        {
             face = GetLine();
             canvas.Children.Add(face);
-
-            // Подписываемся на события изменения позиций
-            RegisterPositionChanged(outputPoint);
-            RegisterPositionChanged(inputPoint);
         }
         public void Dispose()
         {
@@ -84,27 +98,58 @@ namespace L_system.View
             Point endPoint = inputPoint.TranslatePoint(new Point(inputPoint.Width / 2, inputPoint.Height / 2), canvas);
             Vector difference = endPoint - startPoint;
 
-            double offsetX = 20 + Math.Clamp(Math.Abs(difference.Y) / 5, 0, 100) + Math.Clamp(-difference.X / 3, 0, 100);
-            double offsetY = Math.Clamp(-difference.X/2, 0, 300) * Math.Sign(difference.Y) * Math.Sign(difference.X);
+            double offsetX = 0; double offsetY = 0;
+            bool XorFlip = inputNode.Flipped ^ outputNode.Flipped;
+            bool NodeFrontByFront = difference.X > 0 && !inputNode.Flipped && !outputNode.Flipped
+                                 || difference.X < 0 && inputNode.Flipped && outputNode.Flipped;
 
-            Point controlPoint1 = new Point(startPoint.X + offsetX, startPoint.Y - offsetY);
-            Point controlPoint2 = new Point(endPoint.X - offsetX, endPoint.Y + offsetY);
+
+            offsetX = 60 * Math.Clamp(Math.Abs(difference.Y), 0, 200) / 200 + 50 * Math.Clamp(Math.Abs(difference.X), 0, 200) / 200;
+            offsetY = 50 * Math.Clamp(-difference.Y, -200, 200) / 200;
+
+            if (!NodeFrontByFront) offsetY -= 100 * Math.Clamp(Math.Abs(difference.X), 0, 200) / 200 * Math.Sign(difference.Y);
+
+            double cp1X = outputNode.Flipped ? -offsetX : offsetX;
+            double cp1Y = -offsetY;
+            Point controlPointNearStart = new Point(startPoint.X + cp1X, startPoint.Y + cp1Y);
+
+            double cp2X = inputNode.Flipped ? offsetX : -offsetX;
+            double cp2Y = offsetY;
+            Point controlPointNearEnd = new Point(endPoint.X + cp2X, endPoint.Y + cp2Y);
 
             PathGeometry geometry = new PathGeometry();
             PathFigure figure = new PathFigure { StartPoint = startPoint };
-            BezierSegment bezierSegment = new BezierSegment(controlPoint1, controlPoint2, endPoint, true);
+            BezierSegment bezierSegment = new BezierSegment(controlPointNearStart, controlPointNearEnd, endPoint, true);
             figure.Segments.Add(bezierSegment);
             geometry.Figures.Add(figure);
 
             Path path = new Path
             {
-                Stroke = Brushes.White,
+                Stroke = GetGradientForLine(startPoint, endPoint),
                 StrokeThickness = 4,
                 Data = geometry
             };
             path.MouseMove += MouseCut;
 
             return path;
+        }
+
+
+        //private static double Normalize()
+        //{
+        //    return 60 * Math.Clamp(Math.Abs(difference.Y), 0, 200) / 200;
+        //}
+
+        private Brush GetGradientForLine(Point start, Point end)
+        {
+            LinearGradientBrush gradientBrush = new LinearGradientBrush();
+            gradientBrush.StartPoint = start; 
+            gradientBrush.EndPoint = end;
+            gradientBrush.MappingMode = BrushMappingMode.Absolute;
+            gradientBrush.GradientStops.Add(new GradientStop(Colors.Red, 0.0));
+            gradientBrush.GradientStops.Add(new GradientStop(Colors.Blue, 1.0));
+
+            return gradientBrush;
         }
     }
 }

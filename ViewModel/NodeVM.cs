@@ -61,6 +61,10 @@ namespace L_system.ViewModel
         }
         public void SetValueToDefInput(object value, int inputIndex)
         {
+            if (value is double)
+            {
+                value = Math.Clamp((double)value, 0.0001D, 1000D);
+            }
             nodeCore.defaultInputs[inputIndex] = value;
         }
         public bool IsInputFree(int inputIndex)

@@ -60,7 +60,10 @@ namespace L_system.Systems
                     ConnectionVM core = new ConnectionVM(OutputNode.nodeCore, OutputIndex, InputNode.nodeCore, InputIndex);
 
                     Canvas canvas = (Canvas)InputNode.face.Parent;
-                    ConnectionV connection = new ConnectionV(core, OutputPoint, InputPoint, canvas);
+                    ConnectionV connection = new ConnectionV(core, canvas);
+                    connection.SetOutputNode(OutputNode, OutputPoint);
+                    connection.SetInputNode(InputNode, InputPoint);
+                    connection.EndCreate();
 
                     connections.Add(connection);
                 }

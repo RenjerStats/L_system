@@ -16,25 +16,26 @@ namespace L_system.View
         public NodeVM nodeCore;
         public Border face;
         public Canvas canvas;
-        public Ellipse[] inputsPoint;
-        public Ellipse[] outputsPoint;
+        public Ellipse[] inputsCircles;
+        public Ellipse[] outputsCircles;
         public DefaultInputV[] defaultInputs;
 
         public bool MiniSize { get; private set; } = false;
+        public bool Flipped { get; private set; } = false;
 
         public NodeV(Point position, NodeVM core, Canvas canvas)
         {
             nodeCore = core;
             this.canvas = canvas;
 
-            inputsPoint = new Ellipse[core.GetInputsCount()];
+            inputsCircles = new Ellipse[core.GetInputsCount()];
             defaultInputs = new DefaultInputV[core.GetInputsCount()];
 
             for (int i = 0; i < core.GetInputsCount(); i++)
-                inputsPoint[i] = CreatePoint(i, true);
-            outputsPoint = new Ellipse[core.GetOutputsCount()];
+                inputsCircles[i] = CreatePoint(i, true);
+            outputsCircles = new Ellipse[core.GetOutputsCount()];
             for (int i = 0; i < core.GetOutputsCount(); i++)
-                outputsPoint[i] = CreatePoint(i, false);
+                outputsCircles[i] = CreatePoint(i, false);
 
 
             face = new Border()
@@ -59,8 +60,26 @@ namespace L_system.View
             for (int i = 0; i < core.GetInputsCount(); i++)
             {
                 if (nodeCore.GetTypeOfInput(i) == "Double")
-                    defaultInputs[i] = new DefaultInputV(core, i, inputsPoint[i], canvas);
+                    defaultInputs[i] = new DefaultInputV(core, i, inputsCircles[i], canvas);
             }
+        }
+
+        public void Dispose()
+        {
+            foreach (var connection in ConnectionSystem.connections.ToList().Where((a) => a.connectionCore.inputNode == nodeCore))
+            {
+                connection.Dispose();
+            }
+            foreach (var connection in ConnectionSystem.connections.ToList().Where((a) => a.connectionCore.outputNode == nodeCore))
+            {
+                connection.Dispose();
+            }
+            foreach (var defInput in defaultInputs)
+            {
+                defInput?.Dispose();
+            }
+
+            canvas.Children.Remove(face);
         }
 
         #region Visual
@@ -68,6 +87,67 @@ namespace L_system.View
         private Grid CreateNormalForm()
         {
             Grid form = new Grid();
+
+            InitializeForm(form);
+            InitializeNameOfNode(form, 0, 3);
+            InitializeButtonMiniForm(form, 3);
+
+            InitializeGridForCircles(form, inputsCircles, 1, Flipped ? 3 : 0);
+            InitializeGridForCircles(form, outputsCircles, 1, Flipped ? 0 : 3);
+
+            HorizontalAlignment left = HorizontalAlignment.Left;
+            HorizontalAlignment right = HorizontalAlignment.Right;
+            InitializeGridForNames(form, nodeCore.GetNameOfInputs(), 1, Flipped ? 2 : 1, Flipped ? right : left);
+            InitializeGridForNames(form, nodeCore.GetNameOfOutputs(), 1, Flipped ? 1 : 2, Flipped ? left : right);
+
+            InitializePreview(form);
+
+            return form;
+        }
+        private Grid CreateMiniForm()
+        {
+            Grid form = new Grid();
+
+            InitializeMiniForm(form);
+            InitializeNameOfNode(form, 1);
+            InitializeButtonMiniForm(form, 2);
+
+            InitializeGridForCircles(form, inputsCircles, 0, Flipped ? 3 : 0);
+            InitializeGridForCircles(form, outputsCircles, 0, Flipped ? 0 : 3);
+
+            return form;
+        }
+
+
+        private void InitializeButtonMiniForm(Grid form, int column)
+        {
+            Button button_MiniSize = new Button();
+            button_MiniSize.Click += OnCollapse;
+            button_MiniSize.Foreground = Brushes.White;
+            button_MiniSize.Background = Brushes.Transparent;
+            button_MiniSize.BorderBrush = Brushes.Transparent;
+            button_MiniSize.Content = ">";
+
+            Grid.SetRow(button_MiniSize, 0);
+            Grid.SetColumn(button_MiniSize, column);
+            form.Children.Add(button_MiniSize);
+        }
+
+        private void InitializeNameOfNode(Grid form, int column, int columnSpan = 1)
+        {
+            TextBox name = CreateSimpleText(nodeCore.GetNameOfNode());
+            name.FontSize = MiniSize ? 14 : 12;
+            name.Padding = new Thickness(0, 5, 0, 0);
+            name.VerticalAlignment = VerticalAlignment.Center;
+
+            Grid.SetRow(name, 0);
+            Grid.SetColumn(name, column);
+            Grid.SetColumnSpan(name, columnSpan);
+            form.Children.Add(name);
+        }
+
+        private void InitializeForm(Grid form)
+        {
             for (int i = 0; i < 3; i++)
                 form.RowDefinitions.Add(new RowDefinition());
             form.RowDefinitions[0].Height = new GridLength(20);
@@ -82,97 +162,65 @@ namespace L_system.View
             form.ColumnDefinitions[1].Width = new GridLength(isInputEmpty ? 0 : 0.45, GridUnitType.Star);
             form.ColumnDefinitions[2].Width = new GridLength(isOutputEmpty ? 0 : 0.45, GridUnitType.Star);
             form.ColumnDefinitions[3].Width = new GridLength(isOutputEmpty ? 0 : 15);
+        }
 
-            TextBox name = CreateSimpleText(nodeCore.GetNameOfNode());
-            name.FontSize = 12;
-            name.Padding = new Thickness(0, 5, 0, 0);
+        private void InitializeMiniForm(Grid form)
+        {
+           form.RowDefinitions.Add(new RowDefinition());
 
-            Grid.SetRow(name, 0);
-            Grid.SetColumn(name, 0);
-            Grid.SetColumnSpan(name, 3);
-            form.Children.Add(name);
+            for (int i = 0; i < 4; i++)
+                form.ColumnDefinitions.Add(new ColumnDefinition());
+            bool isInputEmpty = inputsCircles.Length == 0;
+            bool isOutputEmpty = outputsCircles.Length == 0;
+            form.ColumnDefinitions[0].Width = new GridLength(isInputEmpty ? 0 : 15);
+            form.ColumnDefinitions[1].Width = new GridLength(1, GridUnitType.Star);
+            form.ColumnDefinitions[2].Width = new GridLength(15);
+            form.ColumnDefinitions[3].Width = new GridLength(isOutputEmpty ? 0 : 15);
+        }
 
-            Button button = new Button();
-            button.Click += OnCollapse;
-            button.Foreground = Brushes.White;
-            button.Background = Brushes.Transparent;
-            button.BorderBrush = Brushes.Transparent;
-            button.Content = ">";
+        private void InitializeGridForCircles(Grid form, Ellipse[] circles, int row, int column)
+        {
+            Grid gridForCircles = new Grid();
+            for (int i = 0; i < circles.Length; i++)
+                gridForCircles.RowDefinitions.Add(new RowDefinition());
+            gridForCircles.ColumnDefinitions.Add(new ColumnDefinition());
 
-            Grid.SetRow(button, 0);
-            Grid.SetColumn(button, 3);
-            form.Children.Add(button);
-
-            Grid inputCircles = new Grid();
-            for (int i = 0; i < nodeCore.GetInputsCount(); i++)
-                inputCircles.RowDefinitions.Add(new RowDefinition());
-            inputCircles.ColumnDefinitions.Add(new ColumnDefinition());
-
-            for (int i = 0; i < nodeCore.GetInputsCount(); i++)
+            for (int i = 0; i < circles.Length; i++)
             {
-                Ellipse input = inputsPoint[i];
-                inputCircles.Children.Add(input);
+                Ellipse circle = circles[i];
+                gridForCircles.Children.Add(circle);
             }
-            Grid.SetRow(inputCircles, 1);
-            Grid.SetColumn(inputCircles, 0);
-            form.Children.Add(inputCircles);
+            Grid.SetRow(gridForCircles, row);
+            Grid.SetColumn(gridForCircles, column);
+            form.Children.Add(gridForCircles);
+        }
 
+        private void InitializeGridForNames(Grid form, string[] names, int row, int column, HorizontalAlignment alignment)
+        {
+            Grid gridForNames = new Grid();
+            for (int i = 0; i < names?.Length; i++)
+                gridForNames.RowDefinitions.Add(new RowDefinition());
+            gridForNames.ColumnDefinitions.Add(new ColumnDefinition());
 
-            Grid inputNames = new Grid();
-            for (int i = 0; i < nodeCore.GetInputsCount(); i++)
-                inputNames.RowDefinitions.Add(new RowDefinition());
-            inputNames.ColumnDefinitions.Add(new ColumnDefinition());
-
-            for (int i = 0; i < nodeCore.GetInputsCount(); i++)
+            for (int i = 0; i < names?.Length; i++)
             {
-                TextBox nameInput = CreateSimpleText(nodeCore.GetNameOfInputs()[i], HorizontalAlignment.Left);
-                nameInput.VerticalAlignment = VerticalAlignment.Center;
-                Grid.SetRow(nameInput, i);
-                Grid.SetColumn(nameInput, 0);
-                inputNames.Children.Add(nameInput);
+                TextBox name = CreateSimpleText(names[i], alignment);
+                name.VerticalAlignment = VerticalAlignment.Center;
+                Grid.SetRow(name, i);
+                Grid.SetColumn(name, 0);
+                gridForNames.Children.Add(name);
             }
-            Grid.SetRow(inputNames, 1);
-            Grid.SetColumn(inputNames, 1);
-            form.Children.Add(inputNames);
+            Grid.SetRow(gridForNames, row);
+            Grid.SetColumn(gridForNames, column);
+            form.Children.Add(gridForNames);
+        }
 
-
-            Grid outputCircles = new Grid();
-            for (int i = 0; i < nodeCore.GetOutputsCount(); i++)
-                outputCircles.RowDefinitions.Add(new RowDefinition());
-            outputCircles.ColumnDefinitions.Add(new ColumnDefinition());
-
-            for (int i = 0; i < nodeCore.GetOutputsCount(); i++)
-            {
-                Ellipse output = outputsPoint[i];
-                outputCircles.Children.Add(output);
-            }
-            Grid.SetRow(outputCircles, 1);
-            Grid.SetColumn(outputCircles, 3);
-            form.Children.Add(outputCircles);
-
-
-            Grid outputNames = new Grid();
-            for (int i = 0; i < nodeCore.GetOutputsCount(); i++)
-                outputNames.RowDefinitions.Add(new RowDefinition());
-            outputNames.ColumnDefinitions.Add(new ColumnDefinition());
-
-            for (int i = 0; i < nodeCore.GetOutputsCount(); i++)
-            {
-                TextBox nameOutput = CreateSimpleText(nodeCore.GetNameOfOutputs()[i], HorizontalAlignment.Right);
-                nameOutput.VerticalAlignment = VerticalAlignment.Center;
-                Grid.SetRow(nameOutput, i);
-                Grid.SetColumn(nameOutput, 0);
-                outputNames.Children.Add(nameOutput);
-            }
-            Grid.SetRow(outputNames, 1);
-            Grid.SetColumn(outputNames, 2);
-            form.Children.Add(outputNames);
-
+        private void InitializePreview(Grid form)
+        {
             UIElement preview = GetPreview();
             Grid.SetRow(preview, 2);
             Grid.SetColumnSpan(preview, 4);
             form.Children.Add(preview);
-            return form;
         }
 
         private UIElement GetPreview()
@@ -193,70 +241,6 @@ namespace L_system.View
                 default:
                     return CreateSimpleText("");
             }
-        }
-
-        private Grid CreateMiniForm()
-        {
-            Grid form = new Grid();
-            form.RowDefinitions.Add(new RowDefinition());
-            for (int i = 0; i < 4; i++)
-                form.ColumnDefinitions.Add(new ColumnDefinition());
-            bool isInputEmpty = nodeCore.GetInputsCount() == 0;
-            bool isOutputEmpty = nodeCore.GetOutputsCount() == 0;
-            form.ColumnDefinitions[0].Width = new GridLength(isInputEmpty ? 0 : 15);
-            form.ColumnDefinitions[1].Width = new GridLength(1, GridUnitType.Star);
-            form.ColumnDefinitions[2].Width = new GridLength(15);
-            form.ColumnDefinitions[3].Width = new GridLength(isOutputEmpty ? 0 : 15);
-
-            TextBox name = CreateSimpleText(nodeCore.GetNameOfNode());
-            name.VerticalContentAlignment = VerticalAlignment.Center;
-            name.FontSize = 14;
-
-            Grid.SetRow(name, 0);
-            Grid.SetColumn(name, 1);
-            form.Children.Add(name);
-
-            Button button = new Button();
-            button.Click += OnCollapse;
-            button.Foreground = Brushes.White;
-            button.Background = Brushes.Transparent;
-            button.BorderBrush = Brushes.Transparent;
-            button.Content = "<";
-
-            Grid.SetRow(button, 0);
-            Grid.SetColumn(button, 2);
-            form.Children.Add(button);
-
-
-            Grid inputCircles = new Grid();
-            for (int i = 0; i < nodeCore.GetInputsCount(); i++)
-                inputCircles.RowDefinitions.Add(new RowDefinition());
-            inputCircles.ColumnDefinitions.Add(new ColumnDefinition());
-
-            for (int i = 0; i < nodeCore.GetInputsCount(); i++)
-            {
-                Ellipse input = inputsPoint[i];
-                inputCircles.Children.Add(input);
-            }
-            Grid.SetRow(inputCircles, 0);
-            Grid.SetColumn(inputCircles, 0);
-            form.Children.Add(inputCircles);
-
-            Grid outputCircles = new Grid();
-            for (int i = 0; i < nodeCore.GetOutputsCount(); i++)
-                outputCircles.RowDefinitions.Add(new RowDefinition());
-            outputCircles.ColumnDefinitions.Add(new ColumnDefinition());
-
-            for (int i = 0; i < nodeCore.GetOutputsCount(); i++)
-            {
-                Ellipse output = outputsPoint[i];
-                outputCircles.Children.Add(output);
-            }
-            Grid.SetRow(outputCircles, 0);
-            Grid.SetColumn(outputCircles, 3);
-            form.Children.Add(outputCircles);
-
-            return form;
         }
 
         private TextBox CreateSimpleText(string content, HorizontalAlignment alignment = HorizontalAlignment.Center)
@@ -353,20 +337,35 @@ namespace L_system.View
 
         #endregion
 
+        #region ActionsWithNode
+
         private void OnCollapse(object sender, RoutedEventArgs e)
         {
             MiniSize = !MiniSize;
 
-            for (int i = 0; i < nodeCore.GetInputsCount(); i++) // Удаляем старые значения parent для Ellipses
+            RecreateFace();
+        }
+        public void Flip()
+        {
+            Flipped = !Flipped;
+            FlipCircleAlignment(inputsCircles);
+            FlipCircleAlignment(outputsCircles);
+
+            RecreateFace();
+        }
+
+        private void FlipCircleAlignment(Ellipse[] cirles)
+        {
+            foreach (var point in cirles)
             {
-                Grid parent = (Grid)inputsPoint[i].Parent;
-                parent.Children.Remove(inputsPoint[i]);
+                bool isLeft = point.HorizontalAlignment == HorizontalAlignment.Left;
+                point.HorizontalAlignment = isLeft ? HorizontalAlignment.Right : HorizontalAlignment.Left;
             }
-            for (int i = 0; i < nodeCore.GetOutputsCount(); i++)
-            {
-                Grid parent = (Grid)outputsPoint[i].Parent;
-                parent.Children.Remove(outputsPoint[i]);
-            }
+        }
+
+        private void RecreateFace()
+        {
+            DetachDependencies();
 
             if (MiniSize)
             {
@@ -381,13 +380,37 @@ namespace L_system.View
                 face.Height = 150;
             }
 
+            UpdateDependencies();
+        }
+
+        private void UpdateDependencies()
+        {
             canvas.UpdateLayout(); //Обновляем позиции Ellipse на Canvas
-            face.SetValue(Canvas.TopProperty, (double)face.GetValue(Canvas.TopProperty) - 0.01);
+            face.SetValue(Canvas.TopProperty, (double)face.GetValue(Canvas.TopProperty) - 0.001); // Обновляем позиции соединяющих линий PositionChanged
             foreach (var defaultInput in defaultInputs)
             {
                 defaultInput?.ResetPosition();
             }
         }
+
+        private void DetachDependencies()
+        {
+            for (int i = 0; i < nodeCore.GetInputsCount(); i++) // Удаляем старые значения parent для Ellipses
+            {
+                Grid parent = (Grid)inputsCircles[i].Parent;
+                parent.Children.Remove(inputsCircles[i]);
+            }
+            for (int i = 0; i < nodeCore.GetOutputsCount(); i++)
+            {
+                Grid parent = (Grid)outputsCircles[i].Parent;
+                parent.Children.Remove(outputsCircles[i]);
+            }
+        }
+
+
+        #endregion
+
+        #region Connection
 
         private void StartConnection(object sender, MouseButtonEventArgs e)
         {
@@ -426,22 +449,6 @@ namespace L_system.View
             ConnectionSystem.EndNewConnection();
         }
 
-        public void Dispose()
-        {
-            foreach (var connection in ConnectionSystem.connections.ToList().Where((a) => a.connectionCore.inputNode == nodeCore))
-            {
-                connection.Dispose();
-            }
-            foreach (var connection in ConnectionSystem.connections.ToList().Where((a) => a.connectionCore.outputNode == nodeCore))
-            {
-                connection.Dispose();
-            }
-            foreach (var defInput in defaultInputs)
-            {
-                defInput?.Dispose();
-            }
-
-            canvas.Children.Remove(face);
-        }
+        #endregion
     }
 }

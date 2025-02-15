@@ -21,7 +21,7 @@ namespace L_system
 
             KeyDown += DeleteNode;
             NodeCanvas.PreviewMouseLeftButtonDown += NodeCanvas_PreviewMouseLeftButtonDown;
-            KeyDown += NodeSystem.DuplicateActiveNode;
+            KeyDown += NodeSystem.KeyPressed;
 
             InitializeUpdateSystem();
 
