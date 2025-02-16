@@ -6,6 +6,8 @@ namespace L_system.ViewModel
     public class NodeVM
     {
         private Node nodeCore;
+        public bool Flipped { get; private set; }
+        public void Flip() => Flipped = !Flipped;
 
         public NodeVM(Node nodeCore)
         {

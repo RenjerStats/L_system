@@ -122,6 +122,7 @@ namespace L_system.Systems
             position -= new Vector(75, 75); // Центрирование ноды
             Node core = activeNode.nodeCore.GetCopyCore();
             NodeV dupNode = new NodeV(position, new NodeVM(core), canvas);
+            if (activeNode.nodeCore.Flipped != dupNode.nodeCore.Flipped) dupNode.Flip();
             dupNode.UpdateZIndex();
 
             nodes.Add(dupNode);

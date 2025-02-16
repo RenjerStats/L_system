@@ -21,7 +21,6 @@ namespace L_system.View
         public DefaultInputV[] defaultInputs;
 
         public bool MiniSize { get; private set; } = false;
-        public bool Flipped { get; private set; } = false;
 
         public NodeV(Point position, NodeVM core, Canvas canvas)
         {
@@ -92,13 +91,13 @@ namespace L_system.View
             InitializeNameOfNode(form, 0, 3);
             InitializeButtonMiniForm(form, 3);
 
-            InitializeGridForCircles(form, inputsCircles, 1, Flipped ? 3 : 0);
-            InitializeGridForCircles(form, outputsCircles, 1, Flipped ? 0 : 3);
+            InitializeGridForCircles(form, inputsCircles, 1, nodeCore.Flipped ? 3 : 0);
+            InitializeGridForCircles(form, outputsCircles, 1, nodeCore.Flipped ? 0 : 3);
 
             HorizontalAlignment left = HorizontalAlignment.Left;
             HorizontalAlignment right = HorizontalAlignment.Right;
-            InitializeGridForNames(form, nodeCore.GetNameOfInputs(), 1, Flipped ? 2 : 1, Flipped ? right : left);
-            InitializeGridForNames(form, nodeCore.GetNameOfOutputs(), 1, Flipped ? 1 : 2, Flipped ? left : right);
+            InitializeGridForNames(form, nodeCore.GetNameOfInputs(), 1, nodeCore.Flipped ? 2 : 1, nodeCore.Flipped ? right : left);
+            InitializeGridForNames(form, nodeCore.GetNameOfOutputs(), 1, nodeCore.Flipped ? 1 : 2, nodeCore.Flipped ? left : right);
 
             InitializePreview(form);
 
@@ -112,8 +111,8 @@ namespace L_system.View
             InitializeNameOfNode(form, 1);
             InitializeButtonMiniForm(form, 2);
 
-            InitializeGridForCircles(form, inputsCircles, 0, Flipped ? 3 : 0);
-            InitializeGridForCircles(form, outputsCircles, 0, Flipped ? 0 : 3);
+            InitializeGridForCircles(form, inputsCircles, 0, nodeCore.Flipped ? 3 : 0);
+            InitializeGridForCircles(form, outputsCircles, 0, nodeCore.Flipped ? 0 : 3);
 
             return form;
         }
@@ -347,7 +346,7 @@ namespace L_system.View
         }
         public void Flip()
         {
-            Flipped = !Flipped;
+            nodeCore.Flip();
             FlipCircleAlignment(inputsCircles);
             FlipCircleAlignment(outputsCircles);
 

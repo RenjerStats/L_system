@@ -87,7 +87,7 @@ namespace L_system.View
         }
         public void ResetPosition()
         {
-            face.SetValue(Canvas.LeftProperty, GetXPositionConnectionPoint() - 60);
+            face.SetValue(Canvas.LeftProperty, GetXPositionConnectionPoint() + (node.Flipped ? 8 : -60));
             face.SetValue(Canvas.TopProperty, GetYPositionConnectionPoint() - 10);
         }
 

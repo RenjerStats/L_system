@@ -15,8 +15,6 @@ namespace L_system.View
     public class ConnectionV : IDisposable
     {
         public ConnectionVM connectionCore;
-        private NodeV inputNode;
-        private NodeV outputNode;
         private Ellipse outputPoint;
         private Ellipse inputPoint;
         private Canvas canvas;
@@ -27,30 +25,33 @@ namespace L_system.View
             this.connectionCore = connectionCore;
             this.canvas = canvas;
         }
-        public void SetInputNode(NodeV node, Ellipse point)
+        public void SetConnectionPoints(Ellipse input, Ellipse output)
         {
-            inputPoint = point;
-            inputNode = node;
+            inputPoint = input;
+            inputPoint.Fill = Brushes.Blue;
+
+            outputPoint = output;
+            outputPoint.Fill = Brushes.Red;
 
             RegisterPositionChanged(inputPoint);
-        }
-        public void SetOutputNode(NodeV node, Ellipse point)
-        {
-            outputPoint = point;
-            outputNode = node;
             RegisterPositionChanged(outputPoint);
         }
+
         public void EndCreate()
         {
-            face = GetLine();
+            face = GetCurve();
             canvas.Children.Add(face);
         }
+
         public void Dispose()
         {
             connectionCore.Dispose();
 
             DeleteRegisterPositionChanged(outputPoint);
             DeleteRegisterPositionChanged(inputPoint);
+
+            inputPoint.Fill = Brushes.White;
+            outputPoint.Fill = Brushes.White;
 
             canvas.Children.Remove(face);
             ConnectionSystem.connections.Remove(this);
@@ -86,42 +87,26 @@ namespace L_system.View
         public void OnPositionChanged(object? sender, EventArgs e)
         {
             canvas.Children.Remove(face);
-            face = GetLine();
+            face = GetCurve();
             canvas.Children.Add(face);
         }
 
         #endregion
 
-        private Path GetLine()
+        #region CreateBezierCurve
+        private Path GetCurve()
         {
             Point startPoint = outputPoint.TranslatePoint(new Point(outputPoint.Width / 2, outputPoint.Height / 2), canvas);
             Point endPoint = inputPoint.TranslatePoint(new Point(inputPoint.Width / 2, inputPoint.Height / 2), canvas);
             Vector difference = endPoint - startPoint;
 
-            double offsetX = 0; double offsetY = 0;
-            bool XorFlip = inputNode.Flipped ^ outputNode.Flipped;
-            bool NodeFrontByFront = difference.X > 0 && !inputNode.Flipped && !outputNode.Flipped
-                                 || difference.X < 0 && inputNode.Flipped && outputNode.Flipped;
+            double offsetX; double offsetY;
+            CreateOffsets(difference, out offsetX, out offsetY);
 
+            Point controlPointNearStart, controlPointNearEnd;
+            CreateControlPoints(startPoint, endPoint, offsetX, offsetY, out controlPointNearStart, out controlPointNearEnd);
 
-            offsetX = 60 * Math.Clamp(Math.Abs(difference.Y), 0, 200) / 200 + 50 * Math.Clamp(Math.Abs(difference.X), 0, 200) / 200;
-            offsetY = 50 * Math.Clamp(-difference.Y, -200, 200) / 200;
-
-            if (!NodeFrontByFront) offsetY -= 100 * Math.Clamp(Math.Abs(difference.X), 0, 200) / 200 * Math.Sign(difference.Y);
-
-            double cp1X = outputNode.Flipped ? -offsetX : offsetX;
-            double cp1Y = -offsetY;
-            Point controlPointNearStart = new Point(startPoint.X + cp1X, startPoint.Y + cp1Y);
-
-            double cp2X = inputNode.Flipped ? offsetX : -offsetX;
-            double cp2Y = offsetY;
-            Point controlPointNearEnd = new Point(endPoint.X + cp2X, endPoint.Y + cp2Y);
-
-            PathGeometry geometry = new PathGeometry();
-            PathFigure figure = new PathFigure { StartPoint = startPoint };
-            BezierSegment bezierSegment = new BezierSegment(controlPointNearStart, controlPointNearEnd, endPoint, true);
-            figure.Segments.Add(bezierSegment);
-            geometry.Figures.Add(figure);
+            PathGeometry geometry = CreateBezierCurve(startPoint, endPoint, controlPointNearStart, controlPointNearEnd);
 
             Path path = new Path
             {
@@ -133,12 +118,53 @@ namespace L_system.View
 
             return path;
         }
+        private void CreateOffsets(Vector difference, out double offsetX, out double offsetY)
+        {
+            bool inputFlipped = connectionCore.inputNode.Flipped;
+            bool outputFlipped = connectionCore.outputNode.Flipped;
+            bool XorFlip = inputFlipped ^ outputFlipped;
+            bool NodeFrontByFront = difference.X > 0 && !inputFlipped && !outputFlipped
+                                 || difference.X < 0 && inputFlipped && outputFlipped;
 
 
-        //private static double Normalize()
-        //{
-        //    return 60 * Math.Clamp(Math.Abs(difference.Y), 0, 200) / 200;
-        //}
+            offsetX = 60 * NormalizeWithAbs(difference.Y, 200) + 50 * NormalizeWithAbs(difference.X, 200);
+            offsetY = 50 * Normalize(-difference.Y, 200);
+
+            if (!NodeFrontByFront) offsetY -= 100 * NormalizeWithAbs(difference.X, 200) * Math.Sign(difference.Y);
+        }
+
+        private static double NormalizeWithAbs(double input, double maxInput)
+        {
+            return Math.Clamp(Math.Abs(input), 0, maxInput) / maxInput;
+        }
+
+        private static double Normalize(double input, double inputRange)
+        {
+            return Math.Clamp(input, -inputRange, inputRange) / inputRange;
+        }
+
+        private void CreateControlPoints(Point startPoint, Point endPoint, double offsetX, double offsetY, out Point controlPointNearStart, out Point controlPointNearEnd)
+        {
+            bool inputFlipped = connectionCore.inputNode.Flipped;
+            bool outputFlipped = connectionCore.outputNode.Flipped;
+
+            double cp1X = outputFlipped ? -offsetX : offsetX;
+            double cp1Y = -offsetY;
+            controlPointNearStart = new Point(startPoint.X + cp1X, startPoint.Y + cp1Y);
+            double cp2X = inputFlipped ? offsetX : -offsetX;
+            double cp2Y = offsetY;
+            controlPointNearEnd = new Point(endPoint.X + cp2X, endPoint.Y + cp2Y);
+        }
+
+        private static PathGeometry CreateBezierCurve(Point startPoint, Point endPoint, Point controlPointNearStart, Point controlPointNearEnd)
+        {
+            PathGeometry geometry = new PathGeometry();
+            PathFigure figure = new PathFigure { StartPoint = startPoint };
+            BezierSegment bezierSegment = new BezierSegment(controlPointNearStart, controlPointNearEnd, endPoint, true);
+            figure.Segments.Add(bezierSegment);
+            geometry.Figures.Add(figure);
+            return geometry;
+        }
 
         private Brush GetGradientForLine(Point start, Point end)
         {
@@ -151,5 +177,7 @@ namespace L_system.View
 
             return gradientBrush;
         }
+
+        #endregion
     }
 }
