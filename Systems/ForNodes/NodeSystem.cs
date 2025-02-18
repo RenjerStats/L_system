@@ -12,7 +12,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
-namespace L_system.Systems
+namespace L_system.Systems.ForNodes
 {
     public static class NodeSystem
     {
@@ -71,7 +71,7 @@ namespace L_system.Systems
             get { return activeNode; }
             set
             {
-                if (activeNode != value) ActiveNodeChange();      
+                if (activeNode != value) ActiveNodeChange();
                 activeNode = value;
             }
         }

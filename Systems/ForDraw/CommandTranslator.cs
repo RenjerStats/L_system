@@ -1,5 +1,4 @@
 ﻿using L_system.Model.core;
-using L_system.Systems;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
 
-namespace DrawTest
+namespace L_system.Systems.ForDraw
 {
     public class CommandTranslator
     {

@@ -8,7 +8,7 @@ using System.Windows.Media;
 using System.Windows.Shapes;
 using System.Xml.Xsl;
 
-namespace L_system.Systems
+namespace L_system.Systems.ForDraw
 {
     public interface IDrawerFractals
     {

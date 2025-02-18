@@ -1,20 +1,33 @@
 ﻿using L_system.Model.core.Nodes;
-using L_system.Systems;
+using L_system.Systems.ForNodes;
 using L_system.ViewModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Media3D;
 using System.Windows.Shapes;
 
 namespace L_system.View
 {
-    public class NodeV : IDisposable  // весит примерно 2 мб в оперативке
+    public class NodeV : IDisposable  // весит примерно 2 мб в оперативке 1 квартал 2025
     {
         public NodeVM nodeCore;
         public Border face;
+        private bool isActive;
+
+        public bool IsActive
+        {
+            get { return isActive; }
+            set
+            {
+                if (isActive == value) return;
+                isActive = value;
+                OnActiveChanged();
+            }
+        }
+
+
         public Canvas canvas;
         public Ellipse[] inputsCircles;
         public Ellipse[] outputsCircles;
@@ -48,8 +61,8 @@ namespace L_system.View
                 Child = CreateNormalForm()
             };
 
-            face.PreviewMouseLeftButtonDown += Node_MouseLeftButtonDown; // Превью обрабатывается раньше, чем дочерние события. Сначала parent, потом children
-            face.PreviewMouseMove += Node_MouseMove;
+            face.MouseLeftButtonDown += Node_MouseLeftButtonDown;
+            face.MouseMove += Node_MouseMove;
             face.MouseLeave += Node_MouseLeave;
 
             Canvas.SetLeft(face, position.X);
@@ -61,6 +74,8 @@ namespace L_system.View
                 if (nodeCore.GetTypeOfInput(i) == "Double")
                     defaultInputs[i] = new DefaultInputV(core, i, inputsCircles[i], canvas);
             }
+
+            face.DataContext = this;
         }
 
         public void Dispose()
@@ -274,22 +289,29 @@ namespace L_system.View
         #endregion
 
         #region Drag
-        double firstXPos, firstYPos;
-        Border? movingFace;
+        private bool isDragging = false;
+        private Point offset;
 
         private void Node_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            movingFace = sender as Border;
+            // Проверяем, был ли клик на Ellipse
+            if (e.OriginalSource is Ellipse)
+            {
+                e.Handled = true; // Предотвращаем дальнейшую обработку
+                return;
+            }
+
+            var border = (Border)sender;
+            isDragging = true;
+            offset = e.GetPosition(border);
+
             NodeSystem.ActiveNode = this;
 
             UpdateZIndex();
             foreach (var defaultInput in defaultInputs)
             {
-                defaultInput?.face.SetValue(Canvas.ZIndexProperty, Canvas.GetZIndex(movingFace));
+                defaultInput?.face.SetValue(Canvas.ZIndexProperty, Canvas.GetZIndex(face));
             }
-
-            firstXPos = e.GetPosition(movingFace).X;
-            firstYPos = e.GetPosition(movingFace).Y;
         }
 
         public void UpdateZIndex()
@@ -306,31 +328,35 @@ namespace L_system.View
 
         private void Node_MouseMove(object sender, MouseEventArgs e)
         {
-            if (e.LeftButton == MouseButtonState.Pressed && movingFace == sender as Border)
+            if (!isDragging) return;
+            if (e.LeftButton != MouseButtonState.Pressed)
             {
-                double newLeft = e.GetPosition(canvas).X - firstXPos;
-                // newLeft inside canvas right-border?
-                if (newLeft > canvas.ActualWidth - movingFace.ActualWidth)
-                    newLeft = canvas.ActualWidth - movingFace.ActualWidth;
-                // newLeft inside canvas left-border?
-                else if (newLeft < 0)
-                    newLeft = 0;
-                movingFace.SetValue(Canvas.LeftProperty, newLeft);
-
-                double newTop = e.GetPosition(canvas).Y - firstYPos;
-                // newTop inside canvas bottom-border?
-                if (newTop > canvas.ActualHeight - movingFace.ActualHeight)
-                    newTop = canvas.ActualHeight - movingFace.ActualHeight;
-                // newTop inside canvas top-border?
-                else if (newTop < 0)
-                    newTop = 0;
-                movingFace.SetValue(Canvas.TopProperty, newTop);
+                isDragging = false;
+                return;
             }
+
+            double newLeft = e.GetPosition(canvas).X - offset.X;
+            // newLeft inside canvas right-border?
+            if (newLeft > canvas.ActualWidth - face.ActualWidth)
+                newLeft = canvas.ActualWidth - face.ActualWidth;
+            // newLeft inside canvas left-border?
+            else if (newLeft < 0)
+                newLeft = 0;
+            face.SetValue(Canvas.LeftProperty, newLeft);
+
+            double newTop = e.GetPosition(canvas).Y - offset.Y;
+            // newTop inside canvas bottom-border?
+            if (newTop > canvas.ActualHeight - face.ActualHeight)
+                newTop = canvas.ActualHeight - face.ActualHeight;
+            // newTop inside canvas top-border?
+            else if (newTop < 0)
+                newTop = 0;
+            face.SetValue(Canvas.TopProperty, newTop);
         }
 
         private void Node_MouseLeave(object sender, MouseEventArgs e)
         {
-            movingFace = null;
+            isDragging = false;
         }
 
 
@@ -406,14 +432,20 @@ namespace L_system.View
             }
         }
 
+        private void OnActiveChanged()
+        {
+            if (isActive) face.BorderBrush = Brushes.White;
+            else face.BorderBrush = Brushes.Black;
+        }
+
+
 
         #endregion
 
         #region Connection
 
         private void StartConnection(object sender, MouseButtonEventArgs e)
-        {
-            movingFace = null; // Сбрасываем ссылку на движимый нод, чтобы он не двигался при создании Connection 
+        { 
             Ellipse point = sender as Ellipse;
             string rowID = point.Tag as string;
 

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Shapes;
 
-namespace L_system.Systems
+namespace L_system.Systems.ForNodes
 {
     public static class ConnectionSystem
     {

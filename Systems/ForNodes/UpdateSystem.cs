@@ -1,4 +1,5 @@
 ﻿using DrawTest;
+using L_system.Systems.ForDraw;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Threading;
 
-namespace L_system.Systems
+namespace L_system.Systems.ForNodes
 {
     public class UpdateSystem
     {
@@ -31,7 +32,7 @@ namespace L_system.Systems
 
         private void OnTimerTick(object sender, EventArgs e)
         {
-            if ((DateTime.Now - lastUpdateTime) < timer.Interval) return;
+            if (DateTime.Now - lastUpdateTime < timer.Interval) return;
 
             Update();
             lastUpdateTime = DateTime.Now;

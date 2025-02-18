@@ -1,5 +1,5 @@
 ﻿using DrawTest;
-using L_system.Systems;
+using L_system.Systems.ForNodes;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -22,6 +22,10 @@ namespace L_system
             KeyDown += DeleteNode;
             NodeCanvas.PreviewMouseLeftButtonDown += NodeCanvas_PreviewMouseLeftButtonDown;
             KeyDown += NodeSystem.KeyPressed;
+
+            NodeCanvas.MouseLeftButtonDown += ActiveNodesSystem.ActionHandler;
+            NodeCanvas.MouseLeftButtonDown += ActiveNodesSystem.StartCreateRectangle;
+            NodeCanvas.MouseLeftButtonUp += ActiveNodesSystem.EndCreateRectangle;
 
             InitializeUpdateSystem();
 
