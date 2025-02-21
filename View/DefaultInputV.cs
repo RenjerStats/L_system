@@ -9,13 +9,14 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 using Windows.Foundation.Collections;
 
 namespace L_system.View
 {
-    public class DefaultInputV : IDisposable
+    public class DefaultInputV
     {
         private readonly DispatcherTimer timer;
 
@@ -52,6 +53,23 @@ namespace L_system.View
             canvas.Children.Add(face);
         }
 
+        public void Dispose()
+        {
+            Hide();
+            face.Loaded -= Face_Loaded;
+            face.MouseLeftButtonDown -= DefaultInput_MouseLeftButtonDown;
+            face.MouseLeftButtonUp -= Reset;
+            face = null;
+            node = null;
+
+            canvas.MouseLeftButtonUp -= Reset;
+            canvas.MouseLeave -= Reset;
+
+            timer.Tick -= OnTimerTick;
+            timer.Stop();
+        }
+
+        #region ShowAndHide
         private void ShowOrNotDefaultInput()
         {
             if (isShow != node.IsInputFree(inputIndex))
@@ -74,6 +92,7 @@ namespace L_system.View
             DeleteRegisterPositionChanged(connectionPoint);
             canvas.Children.Remove(face);
         }
+        #endregion
 
         private void MoveOffScreen()
         {
@@ -81,10 +100,6 @@ namespace L_system.View
             face.SetValue(Canvas.TopProperty, -10D);
         }
 
-        private void Face_Loaded(object sender, RoutedEventArgs e)
-        {
-            ResetPosition();
-        }
         public void ResetPosition()
         {
             face.SetValue(Canvas.LeftProperty, GetXPositionConnectionPoint() + (node.Flipped ? 8 : -60));
@@ -99,6 +114,8 @@ namespace L_system.View
         {
             return connectionPoint.TranslatePoint(new Point(connectionPoint.Width / 2, connectionPoint.Height / 2), canvas).Y;
         }
+
+        #region Visual
 
         private Border CreateForm()
         {
@@ -116,7 +133,7 @@ namespace L_system.View
                 CornerRadius = new CornerRadius(3),
                 BorderBrush = Brushes.Black,
                 BorderThickness = new Thickness(2),
-                Child = child
+                Child = child,
             };
         }
 
@@ -134,6 +151,9 @@ namespace L_system.View
             name.IsEnabled = false;
             return name;
         }
+        #endregion
+
+        #region actions
 
         private void RegisterPositionChanged(Ellipse ellipse)
         {
@@ -156,7 +176,11 @@ namespace L_system.View
         {
             MoveOffScreen();
         }
-
+        private void Face_Loaded(object sender, RoutedEventArgs e)
+        {
+            ResetPosition();
+        }
+        #endregion
 
         #region Drag
         double firstYPos;
@@ -211,11 +235,17 @@ namespace L_system.View
             ResetPosition();
         }
 
-        public void Dispose()
+        public void AnimationMove(Duration duration, bool isEnter)
         {
-            Hide();
-            canvas.MouseLeftButtonUp -= Reset;
-            canvas.MouseLeave -= Reset;
+            double offset = node.Flipped ?  5 : - 5;
+            if (!isEnter) offset *= -1;
+
+            DoubleAnimation moveXAnimation = new DoubleAnimation
+            {
+                To = Canvas.GetLeft(face) + offset,
+                Duration = TimeSpan.FromSeconds(0.2)
+            };
+            face.BeginAnimation(Canvas.LeftProperty, moveXAnimation);
         }
 
         #endregion

@@ -41,6 +41,12 @@ namespace L_system.Model.core.Nodes
             prefNodes = new Node[Inputs.Count];
         }
 
+        public void Dispose()
+        {
+            defaultInputs.CollectionChanged -= Inputs_CollectionChanged;
+            Inputs.CollectionChanged -= Inputs_CollectionChanged;
+        }
+
         public bool CanConnect(int inputIndex, Node prefNode, int outputIndex)
         {
             if (inputIndex < 0 || inputIndex >= Inputs.Count ||

@@ -6,11 +6,12 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 
 namespace L_system.View
 {
-    public class NodeV : IDisposable  // весит примерно 2 мб в оперативке 1 квартал 2025
+    public class NodeV  // весит примерно 2 мб в оперативке 1 квартал 2025
     {
         public NodeVM nodeCore;
         public Border face;
@@ -43,11 +44,11 @@ namespace L_system.View
             inputsCircles = new Ellipse[core.GetInputsCount()];
             defaultInputs = new DefaultInputV[core.GetInputsCount()];
 
-            for (int i = 0; i < core.GetInputsCount(); i++)
-                inputsCircles[i] = CreatePoint(i, true);
+            for (int i = 0; i < inputsCircles.Length; i++)
+                inputsCircles[i] = CreateCircle(i, true);
             outputsCircles = new Ellipse[core.GetOutputsCount()];
-            for (int i = 0; i < core.GetOutputsCount(); i++)
-                outputsCircles[i] = CreatePoint(i, false);
+            for (int i = 0; i < outputsCircles.Length; i++)
+                outputsCircles[i] = CreateCircle(i, false);
 
 
             face = new Border()
@@ -58,28 +59,33 @@ namespace L_system.View
                 CornerRadius = new CornerRadius(10),
                 BorderBrush = Brushes.Black,
                 BorderThickness = new Thickness(2),
-                Child = CreateNormalForm()
+                Child = CreateNormalForm(),
+                RenderTransform = new ScaleTransform(), // Для анимации масштабирования
+                RenderTransformOrigin = new Point(0.5, 0.5) // Центр трансформации
             };
 
-            face.MouseLeftButtonDown += Node_MouseLeftButtonDown;
-            face.MouseMove += Node_MouseMove;
-            face.MouseLeave += Node_MouseLeave;
 
             Canvas.SetLeft(face, position.X);
             Canvas.SetTop(face, position.Y);
             canvas.Children.Add(face);
 
-            for (int i = 0; i < core.GetInputsCount(); i++)
+            for (int i = 0; i < defaultInputs.Length; i++)
             {
                 if (nodeCore.GetTypeOfInput(i) == "Double")
                     defaultInputs[i] = new DefaultInputV(core, i, inputsCircles[i], canvas);
             }
 
             face.DataContext = this;
+            InitializeAnimationHoverForNode();
         }
 
         public void Dispose()
         {
+            foreach (var ellipse in inputsCircles.Concat(outputsCircles))
+            {
+                ellipse.MouseLeftButtonDown -= StartConnection;
+                ellipse.MouseLeftButtonUp -= EndConnection;
+            }
             foreach (var connection in ConnectionSystem.connections.ToList().Where((a) => a.connectionCore.inputNode == nodeCore))
             {
                 connection.Dispose();
@@ -92,11 +98,70 @@ namespace L_system.View
             {
                 defInput?.Dispose();
             }
+            nodeCore.Dispose();
+
+            Grid grid = face.Child as Grid;
+            var button = grid.Children.OfType<Button>().FirstOrDefault();
+            button.Click -= OnCollapse;
+
 
             canvas.Children.Remove(face);
+            face.DataContext = null;
+            DeleteAnimations();
+            face = null;
+            canvas = null;
         }
 
         #region Visual
+        #region Animation
+
+        private void InitializeAnimationHoverForNode()
+        {
+            face.MouseEnter += OnMouseEnter;
+            face.MouseLeave += OnMouseLeave;
+        }
+        private void DeleteAnimations()
+        {
+            face.MouseEnter -= OnMouseEnter;
+            face.MouseLeave -= OnMouseLeave;
+        }
+
+        private void OnMouseEnter(object sender, MouseEventArgs e)
+        {
+            // Анимация увеличения масштаба
+            DoubleAnimation scaleXAnimation = new DoubleAnimation
+            {
+                To = 1.05,
+                Duration = TimeSpan.FromSeconds(0.2)
+            };
+
+            // Применяем анимации
+            face.RenderTransform.BeginAnimation(ScaleTransform.ScaleXProperty, scaleXAnimation);
+            face.RenderTransform.BeginAnimation(ScaleTransform.ScaleYProperty, scaleXAnimation);
+
+            //foreach (var defaultInput in defaultInputs)
+            //{
+            //    defaultInput?.AnimationMove(scaleXAnimation.Duration, true);
+            //}
+        }
+        private void OnMouseLeave(object sender, MouseEventArgs e)
+        {
+            // Анимация возврата к исходному состоянию
+            DoubleAnimation scaleXAnimation = new DoubleAnimation
+            {
+                To = 1.0,
+                Duration = TimeSpan.FromSeconds(0.2)
+            };
+            // Применяем анимации
+            face.RenderTransform.BeginAnimation(ScaleTransform.ScaleXProperty, scaleXAnimation);
+            face.RenderTransform.BeginAnimation(ScaleTransform.ScaleYProperty, scaleXAnimation);
+
+            //foreach (var defaultInput in defaultInputs)
+            //{
+            //    defaultInput?.AnimationMove(scaleXAnimation.Duration, false);
+            //}
+        }
+        #endregion
 
         private Grid CreateNormalForm()
         {
@@ -271,95 +336,68 @@ namespace L_system.View
             return name;
         }
 
-        private Ellipse CreatePoint(int row, bool isInput)
+        private Ellipse CreateCircle(int row, bool isInput)
         {
-            Ellipse point = new Ellipse();
-            point.Stroke = Brushes.White; point.Fill = Brushes.White;
-            point.Width = 10;
-            point.Height = 10;
-            point.Tag = isInput ? row.ToString() : '-' + row.ToString();
-            point.HorizontalAlignment = isInput ? HorizontalAlignment.Left : HorizontalAlignment.Right;
-            point.MouseLeftButtonDown += StartConnection;
-            point.MouseLeftButtonUp += EndConnection;
-            Grid.SetRow(point, row);
-            Grid.SetColumn(point, 0);
-            return point;
+            Ellipse circle = new Ellipse();
+            circle.Stroke = Brushes.White; circle.Fill = Brushes.White;
+            circle.Width = 10;
+            circle.Height = 10;
+            circle.Tag = isInput ? row.ToString() : '-' + row.ToString();
+            circle.HorizontalAlignment = isInput ? HorizontalAlignment.Left : HorizontalAlignment.Right;
+            circle.MouseLeftButtonDown += StartConnection;
+            circle.MouseLeftButtonUp += EndConnection;
+            Grid.SetRow(circle, row);
+            Grid.SetColumn(circle, 0);
+            return circle;
         }
 
         #endregion
 
         #region Drag
-        private bool isDragging = false;
-        private Point offset;
-
-        private void Node_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private Point _position = new Point();
+        public Point Position
         {
-            // Проверяем, был ли клик на Ellipse
-            if (e.OriginalSource is Ellipse)
+            get
             {
-                e.Handled = true; // Предотвращаем дальнейшую обработку
-                return;
+                _position.X = Canvas.GetLeft(face);
+                _position.Y = Canvas.GetTop(face);
+                return _position;
             }
-
-            var border = (Border)sender;
-            isDragging = true;
-            offset = e.GetPosition(border);
-
-            NodeSystem.ActiveNode = this;
-
-            UpdateZIndex();
-            foreach (var defaultInput in defaultInputs)
+            set
             {
-                defaultInput?.face.SetValue(Canvas.ZIndexProperty, Canvas.GetZIndex(face));
+                if (_position == value) return;
+                _position = ClampPosition(value);
+                OnPositionChanged();
             }
         }
 
-        public void UpdateZIndex()
+        private Point ClampPosition(Point value)
         {
-            int maxZIndex = Canvas.GetZIndex(face);
-            foreach (UIElement child in canvas.Children)
-            {
-                if (maxZIndex < Canvas.GetZIndex(child))
-                    maxZIndex = Canvas.GetZIndex(child);
-            }
-
-            Canvas.SetZIndex(face, maxZIndex + 1);
-        }
-
-        private void Node_MouseMove(object sender, MouseEventArgs e)
-        {
-            if (!isDragging) return;
-            if (e.LeftButton != MouseButtonState.Pressed)
-            {
-                isDragging = false;
-                return;
-            }
-
-            double newLeft = e.GetPosition(canvas).X - offset.X;
-            // newLeft inside canvas right-border?
-            if (newLeft > canvas.ActualWidth - face.ActualWidth)
-                newLeft = canvas.ActualWidth - face.ActualWidth;
+            if (value.X > canvas.ActualWidth - face.ActualWidth)
+                value.X = canvas.ActualWidth - face.ActualWidth;
             // newLeft inside canvas left-border?
-            else if (newLeft < 0)
-                newLeft = 0;
-            face.SetValue(Canvas.LeftProperty, newLeft);
+            else if (value.X < 0)
+                value.X = 0;
 
-            double newTop = e.GetPosition(canvas).Y - offset.Y;
             // newTop inside canvas bottom-border?
-            if (newTop > canvas.ActualHeight - face.ActualHeight)
-                newTop = canvas.ActualHeight - face.ActualHeight;
+            if (value.Y > canvas.ActualHeight - face.ActualHeight)
+                value.Y = canvas.ActualHeight - face.ActualHeight;
             // newTop inside canvas top-border?
-            else if (newTop < 0)
-                newTop = 0;
-            face.SetValue(Canvas.TopProperty, newTop);
-        }
+            else if (value.Y < 0)
+                value.Y = 0;
 
-        private void Node_MouseLeave(object sender, MouseEventArgs e)
+            return value;
+        }
+        private void OnPositionChanged()
         {
-            isDragging = false;
+            Canvas.SetLeft(face, _position.X);
+            Canvas.SetTop(face, _position.Y);
         }
 
-
+        public void MoveOn(Vector offset)
+        {
+            Position += offset;
+        }
         #endregion
 
         #region ActionsWithNode
@@ -379,9 +417,12 @@ namespace L_system.View
             RecreateFace();
         }
 
-        private void FlipCircleAlignment(Ellipse[] cirles)
+        public void ChangeForm() => OnCollapse(null, null);
+
+
+        private void FlipCircleAlignment(Ellipse[] circles)
         {
-            foreach (var point in cirles)
+            foreach (var point in circles)
             {
                 bool isLeft = point.HorizontalAlignment == HorizontalAlignment.Left;
                 point.HorizontalAlignment = isLeft ? HorizontalAlignment.Right : HorizontalAlignment.Left;
@@ -434,12 +475,30 @@ namespace L_system.View
 
         private void OnActiveChanged()
         {
-            if (isActive) face.BorderBrush = Brushes.White;
+            if (isActive)
+            {
+                UpdateZIndex();
+                foreach (var defaultInput in defaultInputs)
+                {
+                    defaultInput?.face.SetValue(Canvas.ZIndexProperty, Canvas.GetZIndex(face));
+                }
+
+                face.BorderBrush = Brushes.White;
+            }
             else face.BorderBrush = Brushes.Black;
         }
 
+        public void UpdateZIndex()
+        {
+            int maxZIndex = Canvas.GetZIndex(face);
+            foreach (UIElement child in canvas.Children)
+            {
+                if (maxZIndex < Canvas.GetZIndex(child))
+                    maxZIndex = Canvas.GetZIndex(child);
+            }
 
-
+            Canvas.SetZIndex(face, maxZIndex + 1);
+        }
         #endregion
 
         #region Connection
@@ -448,8 +507,6 @@ namespace L_system.View
         { 
             Ellipse point = sender as Ellipse;
             string rowID = point.Tag as string;
-
-            ConnectionSystem.StartNewConnection();
 
             if (rowID[0] == '-')
             {

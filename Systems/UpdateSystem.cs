@@ -1,5 +1,6 @@
 ﻿using DrawTest;
 using L_system.Systems.ForDraw;
+using L_system.Systems.ForNodes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +11,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Threading;
 
-namespace L_system.Systems.ForNodes
+namespace L_system.Systems
 {
     public class UpdateSystem
     {

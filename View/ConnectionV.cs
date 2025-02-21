@@ -12,7 +12,7 @@ using System.Windows.Shapes;
 
 namespace L_system.View
 {
-    public class ConnectionV : IDisposable
+    public class ConnectionV
     {
         public ConnectionVM connectionCore;
         private Ellipse outputPoint;

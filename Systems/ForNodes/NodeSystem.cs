@@ -2,15 +2,11 @@
 using L_system.Model.core.Nodes;
 using L_system.View;
 using L_system.ViewModel;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Shapes;
 
 namespace L_system.Systems.ForNodes
 {
@@ -64,70 +60,90 @@ namespace L_system.Systems.ForNodes
 
         #endregion
 
-        #region ActiveNode
-        private static NodeV activeNode;
-        public static NodeV ActiveNode
-        {
-            get { return activeNode; }
-            set
-            {
-                if (activeNode != value) ActiveNodeChange();
-                activeNode = value;
-            }
-        }
-
-        public static void OnActiveNodeChange(Action action)
-        {
-            actionsOnInputsChanged.Add(action);
-        }
-        private static List<Action> actionsOnInputsChanged = new List<Action>();
-        private static void ActiveNodeChange()
-        {
-            foreach (var action in actionsOnInputsChanged.ToList())
-            {
-                action();
-            }
-        }
-
-        public static void DeleteActiveNode()
-        {
-            if (activeNode.nodeCore.GetOutputsCount() == 0) nodesEnd.Remove(activeNode);
-            nodes.Remove(activeNode);
-            activeNode.Dispose();
-            activeNode = null;
-        }
-        #endregion
-
         #region ActionWithKeyPress
+        public static void NodeMove(object sender, MouseEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Pressed &&
+                ActiveNodesSystem.GetActiveNodes().Length > 0)
+            {
+                ActiveNodesSystem.UpdateDrag(e.GetPosition((Canvas)sender));
+            }
+        }
+
+        public static Border FindBorder(DependencyObject child)
+        {
+            if (child is Border border) return border;
+            DependencyObject parent = VisualTreeHelper.GetParent(child);
+            while (parent != null && parent is not Border)
+            {
+                parent = VisualTreeHelper.GetParent(parent);
+            }
+            return parent as Border;
+        }
+
+        private static bool canAction = true;
         public static void KeyPressed(object sender, KeyEventArgs e)
         {
-            if (activeNode == null) return;
-            Canvas canvas = activeNode.canvas;
-            if (Keyboard.Modifiers == ModifierKeys.Control)
+            if (!canAction) return;
+            if (ActiveNodesSystem.IsActiveNodesEmpty()) return;
+
+            if (e.Key == Key.M && Keyboard.Modifiers == ModifierKeys.None)
+            {
+                foreach (NodeV node in ActiveNodesSystem.GetActiveNodes())
+                {
+                    node.Flip();
+                }
+                canAction = false;
+            }
+            if (e.Key == Key.D && Keyboard.Modifiers == ModifierKeys.Control)
             {
                 if (e.Key == Key.D)
                 {
-                    Duplicate(canvas);
+                    foreach (NodeV node in ActiveNodesSystem.GetActiveNodes())
+                    {
+                        CreateDuplicate(node, ActiveNodesSystem.GetVectorBetweenNodeAndCenter(node));
+                    }
+                    canAction = false;
                 }
             }
-            else if (Keyboard.Modifiers == ModifierKeys.None && e.Key == Key.M)
+            if (e.Key == Key.Delete && Keyboard.Modifiers == ModifierKeys.None)
             {
-                activeNode.Flip();
+                DeleteNodes();
+                canAction = false;
             }
         }
+        public static void ResetAction(object sender, KeyEventArgs e) => canAction = true;
 
-        private static void Duplicate(Canvas canvas)
+
+        private static void CreateDuplicate(NodeV node, Vector offsetRelativeToCenterOfSystemNode)
         {
+            Canvas canvas = node.canvas;
             Point position = Mouse.GetPosition(canvas);
             position -= new Vector(75, 75); // Центрирование ноды
-            Node core = activeNode.nodeCore.GetCopyCore();
+            position += offsetRelativeToCenterOfSystemNode; //
+
+            Node core = node.nodeCore.GetCopyCore();
             NodeV dupNode = new NodeV(position, new NodeVM(core), canvas);
-            if (activeNode.nodeCore.Flipped != dupNode.nodeCore.Flipped) dupNode.Flip();
+            if (node.nodeCore.Flipped != dupNode.nodeCore.Flipped) dupNode.Flip();
+            if (node.MiniSize != dupNode.MiniSize) dupNode.ChangeForm();
             dupNode.UpdateZIndex();
 
             nodes.Add(dupNode);
             if (core is NodeEnd) nodesEnd.Add(dupNode, core as NodeEnd);
         }
+
+        private static void DeleteNodes()
+        {
+            foreach (var activeNode in ActiveNodesSystem.GetActiveNodes())
+            {
+                nodesEnd.Remove(activeNode);
+                nodes.Remove(activeNode);
+                ActiveNodesSystem.RemoveActiveNode(activeNode);
+                activeNode.Dispose();
+            }
+        }
+
+
         #endregion
 
 

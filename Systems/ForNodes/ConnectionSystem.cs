@@ -37,13 +37,6 @@ namespace L_system.Systems.ForNodes
             OutputPoint = outputPoint;
         }
 
-        public static void StartNewConnection()
-        {
-            OutputNode = null;
-            InputNode = null;
-            InputPoint = null;
-            OutputPoint = null;
-        }
 
         public static void EndNewConnection()
         {
@@ -67,6 +60,14 @@ namespace L_system.Systems.ForNodes
                     connections.Add(connection);
                 }
             }
+            ClearAllReference();
+        }
+        public static void ClearAllReference()
+        {
+            OutputNode = null;
+            InputNode = null;
+            InputPoint = null;
+            OutputPoint = null;
         }
     }
 }

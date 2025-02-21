@@ -1,4 +1,5 @@
 ﻿using DrawTest;
+using L_system.Systems;
 using L_system.Systems.ForNodes;
 using System.Windows;
 using System.Windows.Controls;
@@ -19,13 +20,18 @@ namespace L_system
             MenuItem menuCreateNodes = HeaderMenu.Items[0] as MenuItem;
             InitializeNodeInMenu(menuCreateNodes);
 
-            KeyDown += DeleteNode;
-            NodeCanvas.PreviewMouseLeftButtonDown += NodeCanvas_PreviewMouseLeftButtonDown;
             KeyDown += NodeSystem.KeyPressed;
+            KeyUp += NodeSystem.ResetAction;
+
+            NodeCanvas.MouseLeftButtonDown += ActiveNodesSystem.StartCreateRectangle;
+            NodeCanvas.MouseMove += ActiveNodesSystem.DrawRectangle;
+            NodeCanvas.MouseLeftButtonUp += ActiveNodesSystem.EndCreateRectangle;
+            NodeCanvas.MouseLeave += (a, e) => ActiveNodesSystem.DeleteRectangle();
 
             NodeCanvas.MouseLeftButtonDown += ActiveNodesSystem.ActionHandler;
-            NodeCanvas.MouseLeftButtonDown += ActiveNodesSystem.StartCreateRectangle;
-            NodeCanvas.MouseLeftButtonUp += ActiveNodesSystem.EndCreateRectangle;
+            NodeCanvas.MouseMove += NodeSystem.NodeMove;
+            NodeCanvas.MouseLeave += (s, e) => ActiveNodesSystem.EndDrag();
+            NodeCanvas.MouseLeftButtonUp += (s, e) => ActiveNodesSystem.EndDrag();
 
             InitializeUpdateSystem();
 
@@ -77,14 +83,5 @@ namespace L_system
             NodeSystem.CreateNode((Point)position, NodeCanvas, item.Header.ToString());
         }
 
-        private void NodeCanvas_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e) => NodeSystem.ActiveNode = null;
-
-        private void DeleteNode(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.Delete && NodeSystem.ActiveNode != null)
-            {
-                NodeSystem.DeleteActiveNode();
-            }
-        }
     }
 }

@@ -16,6 +16,16 @@ namespace L_system.ViewModel
             nodeCore.Inputs.CollectionChanged += Inputs_CollectionChanged;
         }
 
+        public void Dispose()
+        {
+            nodeCore.PropertyChanged -= NodeCore_PropertyChanged;
+            nodeCore.Inputs.CollectionChanged -= Inputs_CollectionChanged;
+            nodeCore.Dispose();
+
+            actionsOnOutputChanged.Clear();
+            actionsOnInputsChanged.Clear();
+        }
+
         public Node GetCopyCore()
         {
             return nodeCore.Copy();
