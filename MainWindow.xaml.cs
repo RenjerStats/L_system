@@ -1,5 +1,6 @@
 ﻿using DrawTest;
 using L_system.Systems;
+using L_system.Systems.ForDraw;
 using L_system.Systems.ForNodes;
 using System.Windows;
 using System.Windows.Controls;
@@ -13,12 +14,15 @@ namespace L_system
     public partial class MainWindow : Window
     {
         private UpdateSystem updateSystem;
+        private NavigationForDrawing navigationForNode;
+        private NavigationForDrawing navigationForDrawing;
         public MainWindow()
         {
             InitializeComponent();
 
             MenuItem menuCreateNodes = HeaderMenu.Items[0] as MenuItem;
             InitializeNodeInMenu(menuCreateNodes);
+
 
             KeyDown += NodeSystem.KeyPressed;
             KeyUp += NodeSystem.ResetAction;

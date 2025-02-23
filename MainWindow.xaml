@@ -29,9 +29,13 @@
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
 
-            <Canvas Name="NodeCanvas" Background="#FF330055"/>
+            <Border Name="NodeCanvasForNavigation" ClipToBounds="True" Background="#FF330055">
+                <Canvas Name="NodeCanvas" Background="Transparent"/>
+            </Border>
+           
             <GridSplitter Grid.Column="1" ShowsPreview="False" Width="3" HorizontalAlignment="Center" VerticalAlignment="Stretch" />
-            <Canvas ClipToBounds="True" Grid.Column="2" Name="RenderCanvas" Background="#FF222233"/>
+            
+            <Canvas Name="RenderCanvas" ClipToBounds="True" Grid.Column="2" Background="#FF222233"/>
         </Grid>
         
        

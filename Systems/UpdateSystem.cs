@@ -20,12 +20,14 @@ namespace L_system.Systems
 
         private DrawingCanvas drawingCanvas;
         private CommandTranslator translator;
+        private NavigationForDrawing navigation;
         private double widthDrawingArea;
         private double heightDrawingArea;
 
         public UpdateSystem(DrawingCanvas canvas)
         {
             drawingCanvas = canvas;
+            navigation = new NavigationForDrawing(drawingCanvas);
 
             timer = new DispatcherTimer(DispatcherPriority.Render);
             timer.Tick += OnTimerTick;
@@ -49,7 +51,9 @@ namespace L_system.Systems
 
             foreach (var commands in NodeSystem.GetCommandsFromAllNodesEnd())
             {
-                drawingCanvas.AddDrawingGroup(translator.Convert(commands));
+                DrawingGroup group = translator.Convert(commands);
+                group.Transform = navigation.GetTransform();
+                drawingCanvas.AddDrawingGroup(group);
             }
         }
 
